@@ -28,7 +28,7 @@ header.app-header{display:flex;align-items:flex-start;justify-content:space-betw
 
 /* Header actions: 2 baris rata kanan (atas = icon social, bawah = tools) */
 .header-actions{display:flex;flex-direction:column;align-items:flex-end;gap:12px;margin-left:auto}
-.header-actions-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.header-actions-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;row-gap:8px}
 #communityLinksHeader{display:flex;align-items:center;gap:8px;justify-content:flex-end}
 #communityLinksHeader a{display:inline-flex!important;align-items:center;justify-content:center;width:42px!important;height:42px!important;padding:0!important;font-size:20px;line-height:1;border-radius:var(--radius-md)!important;transition:var(--transition);flex-shrink:0;background:var(--bg-surface-elevated);border:1px solid var(--border);text-decoration:none;color:var(--text-main)}
 #communityLinksHeader a:hover{background:var(--accent-dim);border-color:var(--accent);transform:translateY(-1px)}
@@ -41,7 +41,7 @@ header.app-header{display:flex;align-items:flex-start;justify-content:space-betw
 #btnProfileModal{padding:0 8px!important;min-width:auto!important}
 
 /* ============ TAB NAV ============ */
-nav.tabs-nav{display:flex;align-items:center;gap:5px;overflow-x:auto;overflow-y:hidden;background:var(--bg-surface);border:1px solid var(--border);padding:7px;border-radius:var(--radius-lg);scrollbar-width:thin;scrollbar-color:var(--border-light) transparent;-webkit-overflow-scrolling:touch}
+nav.tabs-nav{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:5px;overflow-x:auto;overflow-y:hidden;background:var(--bg-surface);border:1px solid var(--border);padding:7px;border-radius:var(--radius-lg);scrollbar-width:thin;scrollbar-color:var(--border-light) transparent;-webkit-overflow-scrolling:touch;position:sticky;top:10px;z-index:90;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 nav.tabs-nav::-webkit-scrollbar{height:6px}
 nav.tabs-nav::-webkit-scrollbar-track{background:transparent}
 nav.tabs-nav::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px}
@@ -50,10 +50,10 @@ nav.tabs-nav::-webkit-scrollbar-thumb{background:var(--border-light);border-radi
 .tab-btn.active{color:#fff;background:linear-gradient(135deg,var(--accent),#8b3cf4);box-shadow:0 6px 14px var(--accent-glow)}
 
 main.content-area{position:relative}
-.tab-pane{display:none;flex-direction:column;gap:18px;animation:fadeIn .25s ease-out}
+.tab-pane{display:none;flex-direction:column;gap:18px;animation:fadeIn .25s ease-out;min-width:0}
 .tab-pane.active{display:flex}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.panel{background:var(--panel-gradient);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;box-shadow:0 18px 32px rgba(0,0,0,.28);display:flex;flex-direction:column;gap:16px;position:relative;overflow:hidden}
+.panel{background:var(--panel-gradient);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;box-shadow:0 18px 32px rgba(0,0,0,.28);display:flex;flex-direction:column;gap:16px;position:relative;overflow:hidden;min-width:0}
 .panel::before{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(160,32,240,.6),transparent);opacity:.7}
 .panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .panel-title{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px;color:var(--text-main)}
@@ -115,6 +115,8 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
 .modal-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .modal-body{padding:22px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
 .modal-footer{padding:16px 22px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:flex-end;gap:10px}
+#profileModal .modal-body{max-height:70vh;overflow-y:auto;padding:20px 24px;min-height:0;-webkit-overflow-scrolling:touch}
+#profileModal .modal-footer{position:sticky;bottom:0;background:var(--bg-surface);border-top:1px solid var(--border);padding:16px 22px;z-index:2}
 .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:none}
 .drawer-overlay.active{display:block}
 .drawer{position:fixed;top:0;right:-440px;bottom:0;width:420px;max-width:90vw;background:var(--bg-surface);border-left:1px solid var(--border);z-index:1001;display:flex;flex-direction:column;transition:right .3s cubic-bezier(.16,1,.3,1);box-shadow:-5px 0 25px rgba(0,0,0,.7)}
@@ -134,7 +136,7 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
 .metric-card .metric-label{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
 .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
-.tool-card{background:var(--bg-surface-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tool-card{background:var(--bg-surface-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
 .tool-card:hover{border-color:var(--accent)}
 .tool-card .tool-name{font-weight:600;font-size:14px}
 .tool-card .tool-desc{font-size:12px;color:var(--text-muted);margin-top:2px}
@@ -150,17 +152,86 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
 .guide-card ol{display:grid;gap:6px;padding-left:20px;margin:0}
 .guide-card .btn{margin-top:auto}
 .guide-note{padding:14px 16px;border:1px solid var(--accent-amber);border-radius:6px;color:var(--text-muted);background:var(--accent-amber-dim);font-size:13px}
-@media(max-width:900px){
+/* ============ RESPONSIVE — Laptop & Desktop kecil ============ */
+@media(max-width:1240px){
   .app-header{flex-direction:column;align-items:stretch;gap:14px}
-  .header-actions{justify-content:center;gap:12px;margin-left:0;align-items:center}
+  .header-actions{align-items:center;margin-left:0}
+  .header-actions-right{justify-content:center;width:100%}
+  .brand{justify-content:center}
+  .brand-text h1{flex-wrap:wrap}
+}
+/* ============ RESPONSIVE — Tablet & Android (brand atas, tombol bawah) ============ */
+@media(max-width:900px){
+  .app-header{flex-direction:column;align-items:stretch;gap:14px;padding:16px}
+  .brand{justify-content:center}
+  .header-actions{align-items:center;margin-left:0}
   .header-actions-right{justify-content:center;width:100%}
   #communityLinksHeader{width:100%;justify-content:center;padding:0;border-bottom:none;margin:0;flex-wrap:wrap}
   #communityLinksHeader a{width:44px!important;height:44px!important;font-size:22px}
   #languageSelector{width:140px!important;min-width:140px!important;max-width:140px!important;font-size:13px}
-  .tab-btn{padding:10px 14px;font-size:13px}
-  .brand-text h1{font-size:20px}
+  .header-actions .btn,.header-actions select{min-height:44px;height:44px;font-size:13.5px}
+  .tab-btn{padding:11px 14px;font-size:13.5px;min-height:44px}
+  .brand-text h1{font-size:19px}
+  .brand-icon{width:40px;height:40px}
+  .modal-card{max-width:92vw}
 }
-@media(max-width:768px){.guide-grid{grid-template-columns:1fr}}
+/* ============ RESPONSIVE — Mobile: tab scroll horizontal smooth, scrollbar disembunyikan ============ */
+@media(max-width:768px){
+  .app-container{padding:12px 12px 48px;gap:14px}
+  nav.tabs-nav{top:6px;padding:6px;flex-wrap:nowrap;justify-content:flex-start;scroll-snap-type:x proximity;scrollbar-width:none;-ms-overflow-style:none}
+  nav.tabs-nav::-webkit-scrollbar{display:none;height:0}
+  .tab-btn{scroll-snap-align:start}
+  .panel{padding:16px;border-radius:var(--radius-md)}
+  .panel-header{flex-direction:column;align-items:flex-start;gap:8px}
+  .panel-title{font-size:16px;flex-wrap:wrap}
+  .panel-subtitle{font-size:12px}
+  .form-grid{grid-template-columns:1fr;gap:12px}
+  .tools-grid{grid-template-columns:1fr}
+  .dashboard-grid{grid-template-columns:1fr}
+  .metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .metric-card .metric-value{font-size:22px}
+  .guide-grid{grid-template-columns:1fr}
+  .chart-container{height:200px}
+  .header-actions .btn,.header-actions select{min-height:44px;height:44px;padding:0 12px;font-size:13.5px;border-radius:var(--radius-sm)}
+  .header-actions .btn svg{width:16px;height:16px}
+  .tab-btn{padding:11px 14px;font-size:13.5px;gap:6px;min-height:44px}
+  .brand-text h1{font-size:17px}
+  .brand-text h1 .badge{font-size:9px;padding:3px 7px}
+  .brand-text .panel-subtitle{font-size:11.5px}
+  .dork-item{flex-direction:column;align-items:stretch}
+  .dork-actions{justify-content:flex-end;flex-wrap:wrap}
+  .utility-row{gap:8px}
+  .utility-row .btn{flex:1 1 auto;min-width:110px;justify-content:center}
+  .modal-body{padding:16px}
+  .modal-header{padding:14px 16px}
+  .modal-footer{padding:12px 16px;flex-wrap:wrap}
+  .output-box{font-size:13px;max-height:300px}
+  .toast-container{left:12px;right:12px;bottom:12px}
+  .toast{min-width:0;max-width:none;width:100%}
+  .guide-header h2{font-size:19px}
+  .drawer{width:100vw;max-width:100vw;right:-100vw}
+  .drawer.active{right:0}
+  .table-container{-webkit-overflow-scrolling:touch}
+}
+/* ============ RESPONSIVE — HP Kecil (360-480px): font min 14px, anti iOS zoom ============ */
+@media(max-width:480px){
+  .app-container{padding:10px 10px 44px}
+  .header-actions .btn,.header-actions select{padding:0 10px;font-size:13px}
+  #languageSelector{width:124px!important;min-width:124px!important;max-width:124px!important}
+  .tab-btn{padding:11px 12px;font-size:14px}
+  .brand-icon{width:36px;height:36px}
+  .btn{padding:10px 14px;font-size:14px}
+  .btn-sm{padding:8px 12px;font-size:13px}
+  input[type="text"],input[type="password"],input[type="number"],input[type="email"],input[type="search"],select,textarea{font-size:16px;padding:11px 12px}
+  label{font-size:13.5px}
+  table.data-table td{padding:10px 12px;font-size:13px}
+  table.data-table th{padding:10px 12px;font-size:12.5px}
+  .metric-card{padding:12px}
+  .guide-start{font-size:14px}
+  .panel{padding:14px}
+  .tool-card{flex-wrap:wrap}
+  .tool-card .btn{min-width:88px}
+}
 </style>
 </head>
 <body>
@@ -385,22 +456,25 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
           <div class="form-group"><label>Threads</label><input type="number" id="cmdThreads" value="50" min="1" max="500"></div>
           <div class="form-group"><label>Wordlist</label><input type="text" id="cmdWordlist" value="/usr/share/wordlists/dir.txt"></div>
           <div class="form-group"><label>Custom Header</label><input type="text" id="cmdHeader" value="X-Bug-Bounty: researcher"></div>
+          <div class="form-group"><label>Filter Kategori</label><select id="cmdCategoryFilter"><option value="">Semua Kategori</option></select></div>
         </div>
-        <div style="display:flex;gap:10px;margin-top:4px"><button class="btn btn-primary" id="btnDownloadReconScript">⬇ Download .sh Script</button><button class="btn btn-secondary" id="btnCopyAllCommands">Copy All Pipelines</button></div>
+        <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap"><button class="btn btn-primary" id="btnDownloadReconScript">⬇ Download .sh Script (Pipeline 10 Fase)</button><button class="btn btn-secondary" id="btnCopyAllCommands">Copy All Pipelines</button></div>
         <div style="display:flex;flex-direction:column;gap:12px;margin-top:10px" id="commandCardsContainer"></div>
       </div>
     </section>
 
     <section class="tab-pane" id="tab-recon">
       <div class="panel">
-        <div class="panel-header"><div><h2 class="panel-title">Recon Tools — 14 Utilities</h2><div class="panel-subtitle">Klik Run — command disalin atau URL dibuka.</div></div></div>
+        <div class="panel-header"><div><h2 class="panel-title">Recon Tools — Bug Bounty Toolkit</h2><div class="panel-subtitle">Klik Run — command template disalin atau URL dibuka di tab baru.</div></div><span class="badge badge-purple" id="reconCountBadge">0 Tools</span></div>
+        <div class="form-group"><input type="search" id="reconToolsSearch" placeholder="Cari tools... (mis. subdomain, nuclei, xss, port)"></div>
         <div class="tools-grid" id="reconToolsGrid"></div>
       </div>
     </section>
 
     <section class="tab-pane" id="tab-osint">
       <div class="panel">
-        <div class="panel-header"><div><h2 class="panel-title">OSINT Tools — 5 Utilities</h2><div class="panel-subtitle">Open-source intelligence gathering.</div></div></div>
+        <div class="panel-header"><div><h2 class="panel-title">OSINT Tools — Intelligence Gathering</h2><div class="panel-subtitle">Shodan, Censys, Google, breach data, people & social OSINT.</div></div><span class="badge badge-purple" id="osintCountBadge">0 Tools</span></div>
+        <div class="form-group"><input type="search" id="osintToolsSearch" placeholder="Cari tools... (mis. shodan, email, breach, social)"></div>
         <div class="tools-grid" id="osintToolsGrid"></div>
       </div>
     </section>
@@ -563,6 +637,24 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
         </div>
       </div>
 
+      <!-- Bug Hunter Profile -->
+      <div style="padding:16px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md)">
+        <h3 style="color:var(--text-main);font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px">🕵️</span> Bug Hunter Profile
+        </h3>
+        <div id="profileAvatarPreview" style="width:72px;height:72px;border-radius:50%;overflow:hidden;border:2px solid var(--accent);margin-bottom:12px;background:var(--bg-surface-elevated)"></div>
+        <div class="form-grid">
+          <div class="form-group"><label>Display Name</label><input type="text" id="profileName" placeholder="Nama kamu"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="profileEmail" placeholder="hunter@example.com"></div>
+          <div class="form-group"><label>HackerOne Handle</label><input type="text" id="profileHandle" placeholder="handle-h1"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" id="btnSaveProfile">💾 Save Profile</button>
+          <button class="btn btn-secondary btn-sm" id="btnUploadAvatar">📷 Upload Avatar</button>
+          <button class="btn btn-secondary btn-sm" id="btnCancelProfile">Batal</button>
+        </div>
+      </div>
+
       <!-- Donate -->
       <div style="padding:16px;background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(160,32,240,.08));border:1px solid var(--border);border-radius:var(--radius-md);text-align:center">
         <h3 style="color:var(--text-main);font-size:15px;margin-bottom:6px">💖 Dukung LinuxPloiter</h3>
@@ -584,8 +676,9 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
       </div>
 
       <!-- Legal note -->
-      <div style="padding:12px 14px;background:var(--accent-amber-dim);border:1px solid rgba(245,158,11,.4);border-radius:6px;font-size:12px;color:#fed7aa;line-height:1.5">
-        <strong>⚠️ Legal notice:</strong> Gunakan hanya untuk target yang kamu punya izin (scope program bug bounty, lab sendiri, atau domain milikmu). Segala penyalahgunaan adalah tanggung jawab pengguna sepenuhnya.
+      <div style="padding:16px 18px;background:#fff3cd;border-left:4px solid #f59e0b;border-radius:8px;font-size:13px;line-height:1.6;color:#664d03;">
+        <strong style="font-size:14px;">⚠️ Legal Notice:</strong><br>
+        Gunakan hanya untuk target yang kamu punya izin (scope program bug bounty, lab sendiri, atau domain milikmu). Segala penyalahgunaan adalah tanggung jawab pengguna sepenuhnya.
       </div>
 
     </div>
@@ -739,60 +832,130 @@ function renderDonations(){
 }
 
 var RECON_TOOLS = [
-  {name:'Subfinder',desc:'Passive subdomain enumeration (ProjectDiscovery)',action:'subfinder'},
-  {name:'Amass',desc:'OWASP Amass - In-depth DNS enumeration & ASN',action:'amass'},
-  {name:'Assetfinder',desc:'Find domains/subdomains from multiple sources',action:'assetfinder'},
-  {name:'ShuffleDNS',desc:'DNS bruteforce with wildcard handling',action:'shuffledns'},
-  {name:'PureDNS',desc:'DNS brute-force + mass resolution',action:'puredns'},
-  {name:'CRT.sh',desc:'Certificate Transparency log search',action:'crtsh'},
-  {name:'HTTPX',desc:'Multi-purpose HTTP toolkit for live hosts',action:'httpx'},
-  {name:'DNSX',desc:'DNS toolkit for probing and enumeration',action:'dnsx'},
-  {name:'Naabu',desc:'Fast port scanner (ProjectDiscovery)',action:'naabu'},
-  {name:'Nmap',desc:'Network exploration and security auditing',action:'nmap'},
-  {name:'Masscan',desc:'Fastest internet-scale port scanner',action:'masscan'},
-  {name:'FFUF',desc:'Fast web fuzzer for directories and parameters',action:'ffuf'},
-  {name:'Feroxbuster',desc:'Recursive content discovery (Rust)',action:'feroxbuster'},
-  {name:'Dirsearch',desc:'Web path scanner with extensive wordlists',action:'dirsearch'},
-  {name:'Katana',desc:'Next-gen crawling framework with JS parsing',action:'katana'},
-  {name:'Gospider',desc:'Fast web spider for security testing',action:'gospider'},
-  {name:'Gau',desc:'Get All URLs from archives and sources',action:'gau'},
-  {name:'Waybackurls',desc:'Fetch URLs from Wayback Machine',action:'waybackurls'},
-  {name:'Alterx',desc:'Subdomain wordlist generator (DSL based)',action:'alterx'},
-  {name:'Nuclei',desc:'Template-based vulnerability scanner',action:'nuclei'},
-  {name:'Dalfox',desc:'XSS scanner with DOM analysis',action:'dalfox'},
-  {name:'Arjun',desc:'HTTP parameter discovery',action:'arjun'},
-  {name:'TruffleHog',desc:'Secret scanning in Git repos',action:'trufflehog'},
-  {name:'Gitleaks',desc:'Git secret leak detection',action:'gitleaks'}
+  // === Subdomain Enumeration ===
+  {name:'Subfinder',cat:'Subdomain',desc:'Passive subdomain enum tercepat (ProjectDiscovery) — standar wajib',action:'subfinder'},
+  {name:'Amass',cat:'Subdomain',desc:'OWASP Amass — enum mendalam, ASN & cert monitoring',action:'amass'},
+  {name:'Assetfinder',cat:'Subdomain',desc:'Subdomain dari certs, APIs & public sources',action:'assetfinder'},
+  {name:'PureDNS',cat:'Subdomain',desc:'DNS bruteforce + mass resolution, wildcard filtering',action:'puredns'},
+  {name:'ShuffleDNS',cat:'Subdomain',desc:'Bruteforce DNS cepat berbasis massdns',action:'shuffledns'},
+  {name:'Sublist3r',cat:'Subdomain',desc:'Enum subdomain multi-search-engine (klasik)',action:'sublist3r'},
+  {name:'Alterx',cat:'Subdomain',desc:'Generator wordlist subdomain cerdas berbasis DSL (trending)',action:'alterx'},
+  {name:'DNSDumpster',cat:'Subdomain',desc:'DNS recon & visualisasi subdomain (browser)',action:'dnsdumpster'},
+  {name:'CRT.sh',cat:'Subdomain',desc:'Certificate Transparency log search (browser)',action:'crtsh'},
+  // === DNS & Resolution ===
+  {name:'DNSX',cat:'DNS',desc:'Toolkit DNS: resolve, reverse, brute, AXFR',action:'dnsx'},
+  {name:'DNSRecon',cat:'DNS',desc:'Enum DNS lengkap: std, brute, zone transfer',action:'dnsrecon'},
+  // === HTTP Probing ===
+  {name:'HTTPX',cat:'Probing',desc:'Probe host hidup, tech-detect, title, status — wajib punya',action:'httpx'},
+  {name:'TLSX',cat:'Probing',desc:'Ekstrak & probe TLS alt-names massal (trending)',action:'tlsx'},
+  // === Port Scanning ===
+  {name:'Naabu',cat:'Port Scan',desc:'Port scanner cepat syn/CONNECT (ProjectDiscovery)',action:'naabu'},
+  {name:'Nmap',cat:'Port Scan',desc:'Service & version detection + NSE scripting',action:'nmap'},
+  {name:'Masscan',cat:'Port Scan',desc:'Port scanner skala internet tercepat',action:'masscan'},
+  {name:'RustScan',cat:'Port Scan',desc:'Port scanner modern + auto-Nmap (trending)',action:'rustscan'},
+  // === Crawling ===
+  {name:'Katana',cat:'Crawling',desc:'Crawler next-gen + JS parsing (ProjectDiscovery)',action:'katana'},
+  {name:'Gospider',cat:'Crawling',desc:'Web spider cepat: JS, sitemap, robots',action:'gospider'},
+  {name:'Hakrawler',cat:'Crawling',desc:'Web crawler untuk endpoint discovery',action:'hakrawler'},
+  {name:'Photon',cat:'Crawling',desc:'Crawler ekstraktif + OSINT intel (Python)',action:'photon'},
+  {name:'Crawlergo',cat:'Crawling',desc:'Crawler Chromium dengan smart JS parse',action:'crawlergo'},
+  // === Archive & URL Discovery ===
+  {name:'GAU',cat:'Archive',desc:'Get All URLs: Wayback, CommonCrawl, AlienVault, URLScan',action:'gau'},
+  {name:'Waybackurls',cat:'Archive',desc:'Fetch URL historis dari Wayback Machine',action:'waybackurls'},
+  {name:'URLScan.io',cat:'Archive',desc:'Scan & arsip halaman web + infra (browser)',action:'urlscan'},
+  {name:'GitHub Subdomains',cat:'Archive',desc:'Tarik subdomain dari gist publik GitHub (trending)',action:'github-subdomains'},
+  {name:'Gotator',cat:'Archive',desc:'Generator subdomain permutation + mind maps',action:'gotator'},
+  // === Content Discovery ===
+  {name:'FFUF',cat:'Dir Fuzz',desc:'Fuzzer tercepat: dir, vhost, parameter — standar industri',action:'ffuf'},
+  {name:'Feroxbuster',cat:'Dir Fuzz',desc:'Content discovery rekursif berbasis Rust (trending)',action:'feroxbuster'},
+  {name:'Dirsearch',cat:'Dir Fuzz',desc:'Path scanner dengan ribuan ekstensi & wordlist',action:'dirsearch'},
+  {name:'Gobuster',cat:'Dir Fuzz',desc:'Bruteforce dir, DNS, vhost (Go, cepat)',action:'gobuster'},
+  {name:'ParamSpider',cat:'Dir Fuzz',desc:'Mining parameter dari wayback archive (trending)',action:'paramspider'},
+  // === Parameter Discovery ===
+  {name:'Arjun',cat:'Params',desc:'Discovery hidden HTTP parameter (GET/POST/JSON)',action:'arjun'},
+  {name:'X8',cat:'Params',desc:'Hidden param detection via clustering (trending)',action:'x8'},
+  // === Vulnerability Scanning ===
+  {name:'Nuclei',cat:'Vuln Scan',desc:'Template scanner: CVE, takeover, misconfig — wajib punya',action:'nuclei'},
+  {name:'Dalfox',cat:'Vuln Scan',desc:'XSS scanner & parameter analysis + DOM check',action:'dalfox'},
+  {name:'SQLMap',cat:'Vuln Scan',desc:'Deteksi & eksploitasi SQL injection otomatis',action:'sqlmap'},
+  {name:'Smap',cat:'Vuln Scan',desc:'Nmap-like scan via Shodan API tanpa kirim paket (trending)',action:'smap'},
+  // === Secrets & Source ===
+  {name:'TruffleHog',cat:'Secrets',desc:'Scan 600+ secret types di git, cloud & container (trending)',action:'trufflehog'},
+  {name:'Gitleaks',cat:'Secrets',desc:'Deteksi kebocoran secret/token di git repo',action:'gitleaks'},
+  // === Cloud & S3 Bucket Recon ===
+  {name:'S3Scanner',cat:'Cloud',desc:'Cari & dump open S3 bucket AWS — wajib untuk cloud recon (trending)',action:'s3scanner'},
+  {name:'Cloud_enum',cat:'Cloud',desc:'Enum AWS/GCP/Azure: buckets, apps, storage per keyword',action:'cloudenum'},
+  {name:'CloudBrute',cat:'Cloud',desc:'Bruteforce cloud infra AWS/GCP/Azure/DO (trending)',action:'cloudbrute'},
+  {name:'S3crets Scanner',cat:'Cloud',desc:'Scan listing bucket S3 untuk file sensitif (NCC Group)',action:'s3crets'},
+  {name:'GrayHatWarfare',cat:'Cloud',desc:'Search engine 400M+ public buckets AWS/GCP/Azure (browser)',action:'grayhatwarfare'},
+  {name:'Bucket Finder',cat:'Cloud',desc:'Wordlist-based S3 bucket finder klasik (digi.ninja)',action:'bucketfinder'}
 ];
 var OSINT_TOOLS = [
-  {name:'theHarvester',desc:'Email, subdomain & host OSINT from public sources',action:'theharvester'},
-  {name:'Hunter.io',desc:'Find professional email addresses',action:'hunter'},
-  {name:'Have I Been Pwned',desc:'Check if emails/accounts have been breached',action:'haveibeenpwned'},
-  {name:'Sherlock',desc:'Hunt down social media accounts by username',action:'sherlock'},
-  {name:'Maigret',desc:'Collect dossier on a person by username (3000+ sites)',action:'maigret'},
-  {name:'Blackbird',desc:'OSINT tool for searching by username/email',action:'blackbird'},
-  {name:'SpiderFoot',desc:'Automated multi-source OSINT & threat intel',action:'spiderfoot'},
-  {name:'URLScan.io',desc:'Analyze websites and their infrastructure',action:'urlscan'},
-  {name:'VirusTotal',desc:'Analyze suspicious files and URLs',action:'virustotal'},
-  {name:'Intelligence X',desc:'Search engine for leaked data and OSINT',action:'intelx'},
-  {name:'GreyNoise',desc:'Check if IP is a known scanner or threat',action:'greynoise'},
-  {name:'Shodan',desc:'Internet-connected device search',action:'shodan'},
-  {name:'Censys',desc:'Search hosts, services, and TLS certificates',action:'censys'},
-  {name:'Google Dorking',desc:'Google Hacking Database (GHDB) queries',action:'ghdb'},
-  {name:'Pastebin Search',desc:'Search Pastebin for leaked data',action:'pastebin'},
-  {name:'NerdyData',desc:'Search the source code of websites',action:'nerdydata'},
-  {name:'IPInfo.io',desc:'IP geolocation and ASN details',action:'geoip'},
-  {name:'AbuseIPDB',desc:'Check IP reputation and abuse reports',action:'abuseipdb'}
+  // === People & Social ===
+  {name:'Sherlock',cat:'People',desc:'Lacak akun social media by username (400+ situs)',action:'sherlock'},
+  {name:'Maigret',cat:'People',desc:'Dossier lengkap by username dari 3000+ situs',action:'maigret'},
+  {name:'Blackbird',cat:'People',desc:'Cari username & email massal, fast cluster (trending)',action:'blackbird'},
+  {name:'Social-Searcher',cat:'People',desc:'Search real-time social media (browser)',action:'socialsearcher'},
+  // === Email & Breach ===
+  {name:'theHarvester',cat:'Breach',desc:'Email, subdomain & host dari 100+ public sources',action:'theharvester'},
+  {name:'Hunter.io',cat:'Breach',desc:'Email profesional per domain + verifier',action:'hunter'},
+  {name:'Have I Been Pwned',cat:'Breach',desc:'Cek email/akun kena data breach (browser)',action:'haveibeenpwned'},
+  {name:'H8Mail',cat:'Breach',desc:'Email breach hunting CLI + stealer log (trending)',action:'h8mail'},
+  {name:'Intelligence X',cat:'Breach',desc:'Search engine leak, darknet & paste (browser)',action:'intelx'},
+  {name:'DeHashed',cat:'Breach',desc:'Breach records: email, IP, username, nama (browser)',action:'dehashed'},
+  // === Attack Surface (Internet-Wide Scanners) ===
+  {name:'Shodan',cat:'Infra',desc:'Search engine perangkat terhubung internet',action:'shodan'},
+  {name:'Censys',cat:'Infra',desc:'Host, service & TLS certificate intelligence',action:'censys'},
+  {name:'FOFA',cat:'Infra',desc:'Cyber space search engine (populer di Asia)',action:'fofa'},
+  {name:'ZoomEye',cat:'Infra',desc:'Cyberspace mapping oleh Knownsec',action:'zoomeye'},
+  {name:'Hunter.how',cat:'Infra',desc:'Internet asset search engine baru (trending)',action:'hunterhow'},
+  {name:'FullHunt',cat:'Infra',desc:'Attack surface discovery & monitoring (browser)',action:'fullhunt'},
+  // === Network & IP ===
+  {name:'IPInfo.io',cat:'Network',desc:'Geolocation, ASN & hosting details per IP',action:'geoip'},
+  {name:'AbuseIPDB',cat:'Network',desc:'Reputasi & laporan abuse per IP',action:'abuseipdb'},
+  {name:'GreyNoise',cat:'Network',desc:'Cek apakah IP adalah mass-scanner yang dikenal',action:'greynoise'},
+  {name:'ViewDNS',cat:'Network',desc:'Reverse IP, whois, DNS tools bundle (browser)',action:'reverseip'},
+  {name:'Whois',cat:'Network',desc:'Data registrasi domain & nameserver (browser)',action:'whois'},
+  // === Leaks & Code Search ===
+  {name:'Pastebin Search',cat:'Leaks',desc:'Search paste publik untuk data bocor',action:'pastebin'},
+  {name:'NerdyData',cat:'Leaks',desc:'Search source code & tech di jutaan situs',action:'nerdydata'},
+  {name:'GitHub Code Search',cat:'Leaks',desc:'Cari secret/credential via GitHub search (browser)',action:'githubSearch'},
+  // === Google & Dorks ===
+  {name:'Google Dorking (GHDB)',cat:'Dorks',desc:'Google Hacking Database — ribuan dork siap pakai',action:'ghdb'},
+  {name:'Google Advanced Search',cat:'Dorks',desc:'Bangun query Google bertarget via UI (browser)',action:'googleAdvanced'},
+  // === Social Media Search ===
+  {name:'Twitter/X Advanced',cat:'Social',desc:'Search tweet & akun dengan filter lanjutan',action:'twitterAdvanced'},
+  {name:'LinkedIn People',cat:'Social',desc:'Recon karyawan & struktur organisasi',action:'linkedinSearch'},
+  {name:'Telegram Web',cat:'Social',desc:'Recon channel/grup & leak yang dibagikan',action:'telegramWeb'},
+  // === Automasi ===
+  {name:'SpiderFoot',cat:'Automasi',desc:'OSINT otomatis multi-source (200+ modul)',action:'spiderfoot'}
 ];
 function renderToolCards(tools,containerId){
   var c = $(containerId); if(!c) return;
-  c.innerHTML = tools.map(function(t){return '<div class="tool-card"><div><div class="tool-name">'+esc(t.name)+'</div><div class="tool-desc">'+esc(t.desc)+'</div></div><button class="btn btn-outline-accent btn-sm" data-tool-run="'+esc(t.action)+'">Run</button></div>';}).join('');
+  c.innerHTML = tools.map(function(t){
+    var catBadge = t.cat?'<span class="badge badge-cyan" style="font-size:10px;margin-left:6px">'+esc(t.cat)+'</span>':'';
+    return '<div class="tool-card" data-tool-name="'+esc((t.name+' '+t.desc+' '+(t.cat||'')).toLowerCase())+'"><div><div class="tool-name">'+esc(t.name)+catBadge+'</div><div class="tool-desc">'+esc(t.desc)+'</div></div><button class="btn btn-outline-accent btn-sm" data-tool-run="'+esc(t.action)+'">Run</button></div>';
+  }).join('');
+}
+function updateToolCount(){
+  var r = $('reconToolsGrid'), o = $('osintToolsGrid');
+  var rb = $('reconCountBadge'), ob = $('osintCountBadge');
+  if(r&&rb) rb.textContent = r.querySelectorAll('.tool-card').length+' Tools';
+  if(o&&ob) ob.textContent = o.querySelectorAll('.tool-card').length+' Tools';
 }
 function initTools(){
   renderToolCards(RECON_TOOLS,'reconToolsGrid');
   renderToolCards(OSINT_TOOLS,'osintToolsGrid');
+  updateToolCount();
   document.querySelectorAll('[data-tool-run]').forEach(function(btn){
     btn.addEventListener('click',function(){ runTool(btn.getAttribute('data-tool-run')); });
+  });
+}
+function filterToolCards(containerId,q){
+  var c = $(containerId); if(!c) return;
+  q = (q||'').toLowerCase();
+  c.querySelectorAll('.tool-card').forEach(function(card){
+    card.style.display = (!q || (card.getAttribute('data-tool-name')||'').indexOf(q)>-1) ? '' : 'none';
   });
 }
 function runTool(tool){
@@ -806,7 +969,15 @@ function runTool(tool){
     hunter:'https://hunter.io/', haveibeenpwned:'https://haveibeenpwned.com/',
     pastebin:'https://pastebin.com/', nerdydata:'https://www.nerdydata.com/',
     socialsearcher:'https://www.social-searcher.com/', spiderfoot:'https://www.spiderfoot.net/',
-    ghdb:'https://www.exploit-db.com/google-hacking-database', abuseipdb:'https://www.abuseipdb.com/'
+    ghdb:'https://www.exploit-db.com/google-hacking-database', abuseipdb:'https://www.abuseipdb.com/',
+    dnsdumpster:'https://dnsdumpster.com/', fullhunt:'https://fullhunt.io/',
+    fofa:'https://fofa.info/', zoomeye:'https://www.zoomeye.hk/', hunterhow:'https://hunter.how/',
+    vulners:'https://vulners.com/', nvd:'https://nvd.nist.gov/',
+    twitterAdvanced:'https://twitter.com/search-advanced', linkedinSearch:'https://www.linkedin.com/search/results/people/',
+    telegramWeb:'https://web.telegram.org/', whoisxml:'https://www.whoisxmlapi.com/',
+    dehashed:'https://www.dehashed.com/', googleAdvanced:'https://www.google.com/advanced_search',
+    githubSearch:'https://github.com/search', waybackMachine:'https://web.archive.org/',
+    grayhatwarfare:'https://buckets.grayhatwarfare.com/', bucketfinder:'https://digi.ninja/projects/bucket_finder.php'
   };
   if(urlTools[tool]){
     window.open(urlTools[tool],'_blank','noopener');
@@ -843,7 +1014,18 @@ function runTool(tool){
     sherlock:'sherlock USERNAME',
     maigret:'maigret USERNAME',
     blackbird:'blackbird -u USERNAME',
-    spiderfoot:'spiderfoot -s TARGET -q -o spiderfoot_results.json'
+    spiderfoot:'spiderfoot -s TARGET -q -o spiderfoot_results.json',
+    shodancli:'shodan search "ssl:<TARGET>" --fields ip_str,port,org --separator " | " | tee shodan_results.txt',
+    censyscli:'censys search "names:<TARGET>" --index-type hosts | tee censys_results.txt',
+    h8mail:'h8mail -t EMAIL_TARGET --breachlocal h8mail_breaches',
+    dnsrecon:'dnsrecon -d TARGET -t std,brt -f',
+    photon:'photon -u https://TARGET -l 3 -t 20 --clone',
+    sublist3r:'sublist3r -d TARGET -v -o sublist3r.txt',
+    whoiscli:'whois TARGET | tee whois.txt',
+    s3scanner:'s3scanner scan --bucket-file buckets.txt --out-file s3_results.txt',
+    cloudenum:'cloud_enum -k TARGET -k TARGETnopunc -l cloud_enum.log',
+    cloudbrute:'cloudbrute -d TARGET -w wordlist.txt -t 80 -o cloudbrute_output',
+    s3crets:'s3crets-scanner scan --bucket TARGET --report s3crets_report.json'
   };
   if(cmdMap[tool]){
     copyToClipboard(cmdMap[tool],'Command template disalin! Paste di terminal.');
@@ -942,9 +1124,9 @@ var GUIDE_TOPICS = [
   {title:'4. Shodan Search',tabId:'tab-shodan',tabLabel:'Shodan',desc:'Mencari host dan layanan internet berdasarkan query Shodan, termasuk port, hostname, organisasi, dan sertifikat.',steps:['Simpan Shodan API Key di pengaturan atau isi pada tab ini.','Masukkan query atau pilih salah satu preset, lalu jalankan Search Shodan.','Salin alamat IP atau ekspor hasil ke JSON/CSV.']},
   {title:'5. Censys Search',tabId:'tab-censys',tabLabel:'Censys',desc:'Mencari host, nama virtual host, dan informasi sertifikat TLS menggunakan Censys Hosts API.',steps:['Masukkan Censys API ID dan API Secret di pengaturan atau pada tab.','Tulis query Censys atau pilih preset, lalu jalankan Search Censys.','Salin IP atau ekspor hasil ke JSON/CSV.']},
   {title:'6. HackerOne Scope Fetcher',tabId:'tab-h1scope',tabLabel:'H1 Scope',desc:'Memuat aset in-scope dan out-of-scope dari handle program atau JSON scope yang ditempel.',steps:['Masukkan handle dan pilih Fetch Scope; Load Sample tersedia untuk mencoba tampilan.','Untuk data lokal, buka bagian paste JSON, tempel data, lalu pilih Parse Pasted JSON.','Salin domain in-scope, kirim domain ke scanner/command builder, atau ekspor CSV/Markdown.']},
-  {title:'7. Command Builder',tabId:'tab-commands',tabLabel:'Command Builder',desc:'Membuat perintah dan script shell untuk alur recon CLI seperti Subfinder, HTTPX, Katana, GAU, FFUF, dan DNSX.',steps:['Atur target, file input, direktori output, thread, wordlist, dan custom header.','Salin pipeline yang diperlukan atau semua pipeline.','Download script .sh, tinjau isinya, lalu jalankan sendiri di lingkungan yang sudah memiliki tool terkait.']},
-  {title:'8. Recon Tools',tabId:'tab-recon',tabLabel:'Recon Tools',desc:'Kumpulan 14 utilitas recon cepat. Klik Run untuk menyalin command template atau membuka URL tool terkait.',steps:['Klik Run pada tool yang diinginkan.','Command template otomatis tersalin ke clipboard — paste di terminal.','URL tool akan terbuka di tab baru untuk whois, crt.sh, dan sejenisnya.','Penggunaan tool tercatat otomatis di dashboard.']},
-  {title:'9. OSINT Tools',tabId:'tab-osint',tabLabel:'OSINT Tools',desc:'Kumpulan 5 utilitas open-source intelligence. Klik Run untuk membuka tool atau menyalin command.',steps:['Klik Run pada tool yang diinginkan.','URL akan terbuka atau command akan disalin otomatis.','Gunakan hasilnya untuk memperkaya data recon target.']},
+  {title:'7. Command Builder',tabId:'tab-commands',tabLabel:'Command Builder',desc:'Membuat 55+ perintah CLI siap pakai (Subfinder, HTTPX, Katana, GAU, FFUF, Nuclei, Subzy, CRLFuzz, cloud & S3 bucket recon, dll) plus 15 pipeline otomatis ala bug hunter trending.',steps:['Atur target, file input, direktori output, thread, wordlist, dan custom header.','Gunakan dropdown Filter Kategori untuk menyaring per fase: Subdomain, Cloud Recon, Takeover, JS Recon, Pipeline, dll.','Salin pipeline satu-satu atau Copy All Pipelines sekaligus.','Download script .sh berisi pipeline recon 10 fase lengkap, lalu jalankan di VPS/terminal sendiri (pastikan tool terkait sudah terinstall).']},
+  {title:'8. Recon Tools',tabId:'tab-recon',tabLabel:'Recon Tools',desc:'45+ utilitas recon bug bounty: subdomain, port scanning, crawling, archive, dir fuzzing, cloud & S3 bucket recon (S3Scanner, Cloud_enum, CloudBrute, GrayHatWarfare), sampai secret scanning.',steps:['Gunakan kotak pencarian untuk memfilter tools by nama/kategori.','Klik Run pada tool yang diinginkan.','Command template otomatis tersalin ke clipboard — paste di terminal dan ganti TARGET/USERNAME.','URL tool akan terbuka di tab baru untuk CRT.sh, DNSDumpster, URLScan, dll.','Penggunaan tool tercatat otomatis di dashboard.']},
+  {title:'9. OSINT Tools',tabId:'tab-osint',tabLabel:'OSINT Tools',desc:'30+ tool intelligence: internet-wide scanner (Shodan, Censys, FOFA, ZoomEye), breach data (HIBP, DeHashed, H8Mail), people & social OSINT, sampai Google dorking.',steps:['Gunakan kotak pencarian untuk memfilter tools by kategori: People, Breach, Infra, Network, Leaks, Dorks, Social.','Klik Run pada tool yang diinginkan.','Tool berbasis web terbuka di tab baru; tool CLI menyalin command template.','Gunakan hasilnya untuk memperkaya data recon target.']},
   {title:'10. Bounty Tracker',tabId:'tab-bounty',tabLabel:'Bounty Tracker',desc:'Catat vulnerability yang kamu submit ke program bug bounty, beserta status dan reward yang diterima.',steps:['Klik + Add Entry untuk menambah catatan baru.','Isi program, judul vulnerability, severity, status, dan reward.','Gunakan tombol Delete untuk menghapus entri yang salah.','Data tersimpan permanen di localStorage dan ikut terekspor via Report JSON/CSV.']},
   {title:'11. Report Generator',tabId:'tab-report',tabLabel:'Report Generator',desc:'Membuat laporan vulnerability terstruktur dalam format Markdown dan JSON, siap dikirim ke program bug bounty.',steps:['Isi program, judul, severity, dan deskripsi vulnerability.','Lengkapi langkah reproduksi, impact, dan remediation.','Klik Generate untuk melihat preview di output box.','Copy atau download sebagai .md/.json.']},
   {title:'12. Error Analyzer',tabId:'tab-error',tabLabel:'Error Analyzer',desc:'Menganalisis pesan error atau stack trace menggunakan pattern database, dengan AI fallback jika API key Gemini atau Groq tersedia.',steps:['Paste error message atau stack trace ke textarea.','Klik Analyze Error.','Pattern DB akan mencocokkan 10 kategori error umum (CORS, 401, 403, timeout, dll).','Jika Gemini/Groq API key tersedia, AI akan memberi analisis tambahan.']},
@@ -1362,56 +1544,30 @@ function exportScopeMd(){
   downloadFile(md.join('\n'),'h1_scope.md','text/markdown');
 }
 
-function runTool(tool){
-  recordToolUsage(tool);
-  // Tambahkan URL untuk tools yang baru
-  var urlTools = { 
-    crtsh:'https://crt.sh/', shodan:'https://www.shodan.io/', whois:'https://who.is/', 
-    geoip:'https://ipinfo.io/', cache:'https://webcache.googleusercontent.com/', reverseip:'https://viewdns.info/reverseip/',
-    censys:'https://search.censys.io/', urlscan:'https://urlscan.io/', virustotal:'https://www.virustotal.com/',
-    intelx:'https://intelx.io/', greynoise:'https://www.greynoise.io/', hunter:'https://hunter.io/',
-    haveibeenpwned:'https://haveibeenpwned.com/', pastebin:'https://pastebin.com/', nerdydata:'https://www.nerdydata.com/',
-    socialsearcher:'https://www.social-searcher.com/', spiderfoot:'https://www.spiderfoot.net/'
-  };
-  
-  if(urlTools[tool]){ window.open(urlTools[tool],'_blank','noopener'); showToast('Opened '+tool+' in new tab','success'); addHistoryItem('Tool',tool,'Opened URL'); return; }
-  
-  // Tambahkan command template untuk tools baru
-  var cmdMap = {
-    subfinder:'subfinder -d TARGET -all -silent -o subs.txt',
-    amass:'amass enum -passive -d TARGET -o amass.txt',
-    assetfinder:'assetfinder --subs-only TARGET | tee assetfinder.txt',
-    httpx:'httpx -l subs.txt -title -tech-detect -status-code -o live.txt',
-    dnsx:'dnsx -l subs.txt -resp -a -cname -silent',
-    naabu:'naabu -host TARGET -p 80,443,8000-9000 -silent',
-    nmap:'nmap -sV -sC -p 80,443,8080,8443 TARGET',
-    masscan:'masscan -p1-65535 --rate=10000 TARGET',
-    ffuf:'ffuf -u https://TARGET/FUZZ -w wordlist.txt -mc 200,301,302,403',
-    feroxbuster:'feroxbuster -u https://TARGET -t 50 -x php,html,json',
-    dirsearch:'dirsearch -u https://TARGET -e php,asp,aspx,json,xml',
-    katana:'katana -u https://TARGET -jc -d 3 -o katana.txt',
-    gospider:'gospider -s https://TARGET -d 3 -o output',
-    gau:'gau TARGET --threads 5 | uro | tee gau_urls.txt',
-    waybackurls:'waybackurls TARGET | uro | tee wayback.txt',
-    alterx:'echo "api" | alterx -p "{{word}}-{{env}}" -env "dev,staging,prod"',
-    shuffledns:'shuffledns -d TARGET -w wordlist.txt -r resolvers.txt -o discovered.txt',
-    puredns:'puredns bruteforce wordlist.txt TARGET -r resolvers.txt',
-    nuclei:'nuclei -l live_urls.txt -t cves/ -t exposures/',
-    dalfox:'dalfox file urls.txt --output dalfox_results.txt',
-    arjun:'arjun -u https://TARGET/api/endpoint',
-    theharvester:'theHarvester -d TARGET -b all',
-    sherlock:'sherlock USERNAME',
-    maigret:'maigret USERNAME',
-    blackbird:'blackbird -u USERNAME',
-    spiderfoot:'spiderfoot -s TARGET -q -o spiderfoot_results.json',
-    trufflehog:'trufflehog github --org=ORG --token=$GITHUB_TOKEN --only-verified --json'
-  };
-  
-  if(cmdMap[tool]){ copyToClipboard(cmdMap[tool],'Command template disalin! Paste di terminal.'); addHistoryItem('Tool',tool,'Command template copied'); return; }
-  
-  showToast('Tool "'+tool+'" aktif.','info'); addHistoryItem('Tool',tool,'Activated');
-}
 var COMMAND_TEMPLATES = [
+  // === Host Setup ===
+  {id:'clean_target',name:'Clean Target — IP Resolve & Dedupe',category:'Host Setup',build:function(t,i,o){return 'dig +short '+t+' A | grep -Eo "([0-9]{1,3}[.]){3}[0-9]{1,3}" | sort -u | tee '+o+'/target_ips.txt'}},
+  {id:'dns_baseline',name:'DNS Baseline — NS/MX/TXT Snapshot',category:'Host Setup',build:function(t,i,o){return 'dig '+t+' NS +short && dig '+t+' MX +short && dig '+t+' TXT +short | tee '+o+'/dns_baseline.txt'}},
+  {id:'curl_header_test',name:'Curl — Verify Custom Header Accepted',category:'Host Setup',build:function(t,i,o,th,w,h){return 'curl -sS -o /dev/null -w "%{http_code}" -H "'+h+'" https://'+t+'/'}},
+
+  // === Cloud Recon ===
+  {id:'cloud_enum_tool',name:'Cloud_enum — AWS/GCP/Azure Assets',category:'Cloud Recon',build:function(t,i,o){return 'cloud_enum -k '+t+' -k '+t.replace(/[.]/g,'')+' -l '+o+'/cloud_enum.log'}},
+  {id:'s3_scanner_tool',name:'S3Scanner — Open Bucket Check',category:'Cloud Recon',build:function(t,i,o){return 's3scanner --bucket s3.'+t+' --out-file '+o+'/s3_results.txt'}},
+  {id:'gcp_enum_tool',name:'GCP Enumeration — Storage & Firebase',category:'Cloud Recon',build:function(t,i,o){return 'curl -s "https://'+t.replace(/[.]/g,'-')+'.storage.googleapis.com/" && curl -s "https://'+t+'/.well-known/firebase-hosting.json"'}},
+  {id:'s3scanner_mass',name:'S3Scanner — Mass Bucket Scan dari File',category:'Cloud Recon',build:function(t,i,o){return 's3scanner scan --bucket-file '+o+'/buckets.txt --out-file '+o+'/s3scanner_results.txt'}},
+  {id:'cloudbrute_cmd',name:'CloudBrute — Bruteforce Cloud Storage',category:'Cloud Recon',build:function(t,i,o,th){return 'cloudbrute -d '+t+' -w wordlist.txt -t '+th+' -o '+o+'/cloudbrute'}},
+  {id:'s3_perm_check',name:'S3 — Bucket ACL Permission Sweep',category:'Cloud Recon',build:function(t,i,o){return 'for b in $(cat '+o+'/buckets.txt); do for u in "http://$b.s3.amazonaws.com" "http://s3.amazonaws.com/$b"; do echo "$(curl -s -o /dev/null -w "%{http_code}") $b $u"; done; done | sort -u | tee '+o+'/s3_perm_check.txt'}},
+  {id:'s3_dump_grep',name:'S3 — Dump Bucket & Grep File Sensitif',category:'Cloud Recon',build:function(t,i,o){return 's3scanner scan --bucket '+t+' --dump && grep -rEi "(password|secret|api[_-]?key|token|credential)" scans/ | tee '+o+'/s3_sensitive_hits.txt'}},
+
+  // === Takeover ===
+  {id:'subzy',name:'Subzy — Subdomain Takeover Check',category:'Takeover',build:function(t,i,o,th){return 'subzy run --targets '+i+' --hide_fails --concurrency '+th+' > '+o+'/subzy_results.txt'}},
+  {id:'nuclei_takeover',name:'Nuclei — Takeover Signatures Only',category:'Takeover',build:function(t,i,o){return 'nuclei -l '+i+' -t takeovers/ -silent -o '+o+'/takeover_nuclei.txt'}},
+  {id:'httpx_cname_hint',name:'HTTPX — CNAME Vendor Fingerprint Hints',category:'Takeover',build:function(t,i,o){return 'httpx -l '+i+' -cname -silent | grep -iE "s3|azure|cloudfront|heroku|github[.]io|shopify|fastly|zendesk|takeover" | tee '+o+'/cname_hints.txt'}},
+
+  // === JS Recon ===
+  {id:'subjs',name:'SubJS — JS File Extractor',category:'JS Recon',build:function(t,i,o){return 'subjs -i '+i+' -c 40 -silent | sort -u > '+o+'/js_files.txt'}},
+  {id:'linkfinder',name:'LinkFinder — Endpoints Hidden di JS',category:'JS Recon',build:function(t,i,o){return 'linkfinder -i https://'+t+' -d -o '+o+'/linkfinder'}},
+
   // === Subdomain Recon ===
   {id:'subfinder',name:'Subfinder — Passive Subdomain Enumeration',category:'Subdomain Recon',build:function(t,i,o,th){return 'subfinder -d '+t+' -all -silent -t '+th+' -o '+o+'/subs_'+t+'.txt'}},
   {id:'assetfinder',name:'Assetfinder — Cert & API Subdomains',category:'Subdomain Recon',build:function(t,i,o){return 'assetfinder --subs-only '+t+' | tee '+o+'/assetfinder_'+t+'.txt'}},
@@ -1445,11 +1601,33 @@ var COMMAND_TEMPLATES = [
   {id:'trufflehog',name:'TruffleHog — Secret Scanning in Git',category:'Source Code',build:function(t,i,o){return 'trufflehog github --org='+t+' --token=$GITHUB_TOKEN --only-verified --json > '+o+'/trufflehog_'+t+'.json'}},
   {id:'gitleaks',name:'Gitleaks — Git Secret Leak Detection',category:'Source Code',build:function(t,i,o){return 'gitleaks detect --source=. --report-path='+o+'/gitleaks_report.json'}},
 
+  // === Vuln Scanning (lanjutan) ===
+  {id:'nikto',name:'Nikto — Web Server Misconfiguration Scanner',category:'Vuln Scanning',build:function(t,i,o){return 'nikto -h https://'+t+' -o '+o+'/nikto_results.txt -Format txt'}},
+  {id:'gf_patterns',name:'GF — Pattern Filter URLs (XSS/SSRF/RCE)',category:'Vuln Scanning',build:function(t,i,o){return 'cat '+o+'/gau_urls.txt | gf xss | tee '+o+'/gf_xss.txt && cat '+o+'/gau_urls.txt | gf ssrf > '+o+'/gf_ssrf.txt'}},
+  {id:'qsreplace',name:'QSReplace + Nuclei — Fuzz Param Injection',category:'Vuln Scanning',build:function(t,i,o){return 'cat '+o+'/gf_xss.txt | qsreplace "\"><svg onload=alert(1)>" | nuclei -t xss/ -silent -o '+o+'/xss_fuzz.txt'}},
+  {id:'maquina',name:'Maquina — Botguard/QS Pattern Solver (beta)',category:'Vuln Scanning',build:function(t,i,o){return 'maquina --list-plugins && echo "catat hasil manual ke '+o+'/maquina_notes.txt"'}},
+
+  // === CRLF / Header Injection ===
+  {id:'crlfuzz',name:'CRLFuzz — CRLF Injection Scanner',category:'Header Injection',build:function(t,i,o){return 'crlfuzz -l '+i+' -o '+o+'/crlf_results.txt'}},
+  {id:'header_check_curl',name:'Curl — Security Header Audit',category:'Header Injection',build:function(t,i,o){return 'curl -sI https://'+t+' | grep -iE "strict-transport|x-frame|x-content-type|content-security-policy|referrer-policy|permissions-policy" || echo "[!] Ada header security yang hilang" | tee '+o+'/missing_headers.txt'}},
+  {id:'cors_scan',name:'CORS Scanner — Misconfig Check',category:'Header Injection',build:function(t,i,o){return 'curl -sI -H "Origin: https://evil-'+t.replace(/[.]/g,'-')+'.com" https://'+t+' | grep -i "access-control-allow" | tee '+o+'/cors_check.txt'}},
+
   // === Full Pipeline ===
   {id:'pipeline_subs_httpx',name:'Pipeline ⚡ — Subfinder → HTTPX',category:'Full Pipeline',build:function(t,i,o,th,w,h){return 'subfinder -d '+t+' -all -silent | httpx -silent -title -tech-detect -status-code -H "'+h+'" -o '+o+'/live_'+t+'.txt'}},
   {id:'pipeline_full_sweep',name:'Pipeline ⚡ — Full Passive Sweep',category:'Full Pipeline',build:function(t,i,o){return 'mkdir -p '+o+' && subfinder -d '+t+' -silent > /tmp/subs.txt && assetfinder --subs-only '+t+' >> /tmp/subs.txt && sort -u /tmp/subs.txt | httpx -silent -sc -title -tech-detect -o '+o+'/active_subs.txt'}},
   {id:'pipeline_wayback_sensitive',name:'Pipeline ⚡ — Wayback Sensitive File Mining',category:'Full Pipeline',build:function(t,i,o){return 'waybackurls https://'+t+' | grep -E "\\\\.(xls|xlsx|csv|sql|db|bak|backup|old|tar\\\\.gz|tgz|zip|7z|rar|pdf|pem|key|crt|env|json|yml|yaml|conf|config|git|htpasswd|log|dump|DS_Store)" | sort -u > '+o+'/sensitive_wayback.txt'}},
-  {id:'pipeline_nuclei_auto',name:'Pipeline ⚡ — Subfinder → HTTPX → Nuclei',category:'Full Pipeline',build:function(t,i,o,th){return 'subfinder -d '+t+' -silent | httpx -silent | nuclei -t cves/ -t exposures/ -t takeovers/ -c '+th+' -o '+o+'/nuclei_auto.txt'}}
+  {id:'pipeline_nuclei_auto',name:'Pipeline ⚡ — Subfinder → HTTPX → Nuclei',category:'Full Pipeline',build:function(t,i,o,th){return 'subfinder -d '+t+' -silent | httpx -silent | nuclei -t cves/ -t exposures/ -t takeovers/ -c '+th+' -o '+o+'/nuclei_auto.txt'}},
+  {id:'pipeline_takeover',name:'Pipeline ⚡ — Takeover Hunt (Subzy + Nuclei + CNAME)',category:'Full Pipeline',build:function(t,i,o,th){return 'subfinder -d '+t+' -all -silent | dnsx -silent -a -cname | httpx -silent -status-code | tee '+o+'/takeover_candidates.txt && subzy run --targets '+o+'/takeover_candidates.txt --hide_fails --concurrency '+th+' > '+o+'/subzy.txt && nuclei -l '+o+'/takeover_candidates.txt -t takeovers/ -silent >> '+o+'/subzy.txt'}},
+  {id:'pipeline_xss_hunt',name:'Pipeline ⚡ — XSS Hunt (Katana → GF → Dalfox)',category:'Full Pipeline',build:function(t,i,o,th){return 'katana -u https://'+t+' -d 3 -jc -kf all -silent | grep "=" | gf xss | qsreplace "\"><svg onload=alert(1)>" | dalfox pipe --silence --no-color --skip-mining-dom > '+o+'/xss_found.txt'}},
+  {id:'pipeline_js_secrets',name:'Pipeline ⚡ — JS Secrets (SubJS → Nuclei Exposures)',category:'Full Pipeline',build:function(t,i,o,th){return 'httpx -l '+i+' -silent -no-color | subjs | sort -u > '+o+'/js_all.txt && nuclei -l '+o+'/js_all.txt -t http/exposures/ -silent -o '+o+'/js_secrets.txt'}},
+  {id:'pipeline_403_bypass',name:'Pipeline ⚡ — 403 Bypass (Off-by-Default Paths)',category:'Full Pipeline',build:function(t,i,o){return 'httpx -l '+i+' -silent -status-code -mc 403 | tee '+o+'/forbidden.txt && while read u; do curl -s -o /dev/null -w "%{http_code} $u/..;/ \\n" "$u/..;/"; curl -s -o /dev/null -w "%{http_code} X-Original \\n" -H "X-Original-URL: /admin" "$u"; done < '+o+'/forbidden.txt | tee '+o+'/bypass_403.txt'}},
+  {id:'pipeline_open_redirect',name:'Pipeline ⚡ — Open Redirect Hunt (QSReplace)',category:'Full Pipeline',build:function(t,i,o){return 'cat '+o+'/gau_urls.txt | grep -Ei "(url|redirect|next|return|dest|rurl|goto|out|continue|callback)=" | qsreplace "https://evil.example.com" | httpx -silent -status-code -location -mc 301,302,303,307,308 > '+o+'/open_redirects.txt'}},
+  {id:'pipeline_ssrf',name:'Pipeline ⚡ — SSRF Candidate Mining',category:'Full Pipeline',build:function(t,i,o){return 'cat '+o+'/gau_urls.txt | grep -Ei "(url|path|src|dest|redirect|uri|feed|host|port|to|out|view|dir|show|navigation|open)=" | grep -Eiv "(\\.png|\\.jpg|\\.css|\\.js|\\.ico)" | sort -u > '+o+'/ssrf_candidates.txt && echo "[!] Test manual dengan Burp Collaborator / interactsh"'}},
+  {id:'pipeline_vhost',name:'Pipeline ⚡ — VHOST & Subdomain Permutation Fuzz',category:'Full Pipeline',build:function(t,i,o,th,w){return 'echo "'+t+'" | alterx -o '+o+'/alterx_subs.txt && httpx -l '+o+'/alterx_subs.txt -silent -status-code -title -mc 200,403 -c '+th+' -o '+o+'/vhost_alive.txt'}},
+  {id:'pipeline_screenshot',name:'Pipeline ⚡ — Visual Recon (Gowitness Mass Screenshot)',category:'Full Pipeline',build:function(t,i,o,th){return 'httpx -l '+i+' -silent -no-color | gowitness file -f - --write-screenshot --screenshot-path '+o+'/shots/ --no-httpx'}},
+  {id:'pipeline_port_to_nuclei',name:'Pipeline ⚡ — Naabu Ports → HTTPX → Nuclei',category:'Full Pipeline',build:function(t,i,o,th){return 'naabu -host '+t+' -top-ports 1000 -silent | httpx -silent -ports -status-code -title | tee '+o+'/port_services.txt && nuclei -l '+o+'/port_services.txt -severity low,medium,high,critical -c '+th+' -o '+o+'/port_nuclei.txt'}},
+  {id:'pipeline_s3_recon',name:'Pipeline ⚡ — S3/Cloud Bucket Hunt (Enum → Scan → Dump)',category:'Full Pipeline',build:function(t,i,o){return 'cloud_enum -k '+t+' -l '+o+'/cloud_enum.log && grep -Eo "https?://[a-zA-Z0-9.-]*(s3|amazonaws|azurewebsites|blob[.]core|storage[.]googleapis)[^ ]*" '+o+'/cloud_enum.log | sort -u > '+o+'/cloud_urls.txt && s3scanner scan --bucket-file '+o+'/cloud_urls.txt --out-file '+o+'/s3_open.txt && grep -v bucket_auth '+o+'/s3_open.txt | grep -iE "public|list" | tee '+o+'/s3_public_buckets.txt'}},
+  {id:'pipeline_notify_discord',name:'Pipeline ⚡ — Scan + Push Findings ke Discord',category:'Full Pipeline',build:function(t,i,o,th){return 'nuclei -l '+i+' -severity medium,high,critical -silent -o '+o+'/findings.txt && python3 -c "import json,sys;[sys.stdout.write(json.dumps({\'content\':l})) for l in open(\''+o+'/findings.txt\')]" | xargs -I{} curl -s -X POST -H "Content-Type: application/json" -d \'{}\' "$DISCORD_WEBHOOK_URL"'}}
 ];
 
 function renderCommandCards(){
@@ -1459,18 +1637,29 @@ function renderCommandCards(){
   var threads = nt($('cmdThreads').value)||'50';
   var wl = nt($('cmdWordlist').value)||'/usr/share/wordlists/dir.txt';
   var header = nt($('cmdHeader').value)||'X-Bug-Bounty: researcher';
+  var filter = (function(){ var f = $('cmdCategoryFilter'); return f?f.value:''; })();
+  var categories = [];
+  COMMAND_TEMPLATES.forEach(function(t){ if(categories.indexOf(t.category)<0) categories.push(t.category); });
+  var filterSel = $('cmdCategoryFilter');
+  if(filterSel && filterSel.options.length !== categories.length+1){
+    var cur = filterSel.value;
+    filterSel.innerHTML = '<option value="">Semua Kategori ('+COMMAND_TEMPLATES.length+')</option>'+categories.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>'}).join('');
+    filterSel.value = cur || '';
+  }
+  var visible = COMMAND_TEMPLATES.filter(function(t){ return !filter || t.category===filter; });
   var c = $('commandCardsContainer'); if(!c) return;
-  c.innerHTML = COMMAND_TEMPLATES.map(function(t){
+  c.innerHTML = visible.map(function(t){
     var cmd = t.build(target,input,outDir,threads,wl,header);
     return '<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><span style="font-weight:700;font-size:14px">'+esc(t.name)+'</span><span class="badge badge-purple" style="margin-left:8px">'+esc(t.category)+'</span></div><button class="btn btn-secondary btn-sm" data-copy-text="'+attr(cmd)+'" data-copy-label="Command copied!">Copy</button></div><div class="output-box" style="padding:10px;max-height:80px;font-size:13px;color:var(--accent-cyan)">'+esc(cmd)+'</div></div>';
-  }).join('');
+  }).join('') || '<div style="color:var(--text-dim);text-align:center;padding:30px">Tidak ada command di kategori ini.</div>';
 }
 function downloadReconScript(){
   var target = nt($('cmdTarget').value)||'example.com';
   var outDir = nt($('cmdOutputDir').value)||'recon_output';
   var threads = nt($('cmdThreads').value)||'50';
   var header = nt($('cmdHeader').value)||'X-Bug-Bounty: researcher';
-  var script = '#!/usr/bin/env bash\n# LinuxPloiter Recon Script\n# Target: '+target+'\n# Generated: '+new Date().toISOString()+'\n\nset -euo pipefail\n\nTARGET="'+target+'"\nOUTDIR="'+outDir+'"\nTHREADS="'+threads+'"\nHEADER="'+header+'"\n\necho "[+] Recon untuk $TARGET"\nmkdir -p "$OUTDIR"\n\necho "[*] Subfinder..."\nsubfinder -d "$TARGET" -all -silent -t "$THREADS" -o "$OUTDIR/subfinder.txt"\n\necho "[*] Assetfinder..."\nassetfinder --subs-only "$TARGET" > "$OUTDIR/assetfinder.txt"\n\ncat "$OUTDIR/subfinder.txt" "$OUTDIR/assetfinder.txt" | sort -u > "$OUTDIR/all_subs.txt"\n\necho "[*] HTTPX..."\nhttpx -l "$OUTDIR/all_subs.txt" -title -tech-detect -status-code -threads "$THREADS" -H "$HEADER" -silent -o "$OUTDIR/live_hosts.txt"\n\necho "[*] GAU..."\ngau "$TARGET" --threads 5 | uro > "$OUTDIR/gau_urls.txt" || true\n\necho "[✓] Done! Cek $OUTDIR/"\n';
+  var wl = nt($('cmdWordlist').value)||'/usr/share/wordlists/dir.txt';
+  var script = '#!/usr/bin/env bash\n# ============================================================\n# LinuxPloiter Recon Script v6 — Auto-Generated\n# Target   : '+target+'\n# Generated: '+new Date().toISOString()+'\n#=============================================================\nset -euo pipefail\n\nTARGET="'+target+'"\nOUTDIR="'+outDir+'"\nTHREADS="'+threads+'"\nHEADER="'+header+'"\nWORDLIST="'+wl+'"\nRESOLVERS="$OUTDIR/resolvers.txt"\n\ncommand -v subfinder >/dev/null 2>&1 || { echo "[!] Install subfinder: go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"; }\n\n[ -f "$RESOLVERS" ] || curl -s https://raw.githubusercontent.com/trickest/resolvers/main/resolvers.txt -o "$RESOLVERS" || echo "1.1.1.1\\n8.8.8.8" > "$RESOLVERS"\nmkdir -p "$OUTDIR"\n\necho "[+] Recon dimulai untuk $TARGET -> $OUTDIR/"\n\necho "[*] Fase 1/10: Subdomain Enumeration (Subfinder + Assetfinder)"\nsubfinder -d "$TARGET" -all -silent -t "$THREADS" -o "$OUTDIR/subfinder.txt" || true\nassetfinder --subs-only "$TARGET" > "$OUTDIR/assetfinder.txt" 2>/dev/null || true\ncat "$OUTDIR/subfinder.txt" "$OUTDIR/assetfinder.txt" 2>/dev/null | sort -u > "$OUTDIR/all_subs.txt"\necho "    -> $(wc -l < "$OUTDIR/all_subs.txt" 2>/dev/null || echo 0) subdomain ditemukan"\n\necho "[*] Fase 2/10: DNS Resolution (DNSX)"\ndnsx -l "$OUTDIR/all_subs.txt" -silent -a -cname -t "$THREADS" -o "$OUTDIR/resolved_dns.txt" 2>/dev/null || true\n\necho "[*] Fase 3/10: DNS Bruteforce (ShuffleDNS)"\nshuffledns -d "$TARGET" -w "$WORDLIST" -r "$RESOLVERS" -t "$THREADS" -o "$OUTDIR/bruteforce.txt" 2>/dev/null || echo "[!] shuffledns dilewati"\ncat "$OUTDIR/all_subs.txt" "$OUTDIR/bruteforce.txt" 2>/dev/null | sort -u > "$OUTDIR/all_subs_final.txt" || cp "$OUTDIR/all_subs.txt" "$OUTDIR/all_subs_final.txt"\n\necho "[*] Fase 4/10: Subdomain Takeover Check (Subzy + Nuclei)"\nsubzy run --targets "$OUTDIR/all_subs_final.txt" --hide_fails --concurrency "$THREADS" > "$OUTDIR/takeover.txt" 2>/dev/null || true\nnuclei -l "$OUTDIR/all_subs_final.txt" -t takeovers/ -silent -o "$OUTDIR/takeover_nuclei.txt" 2>/dev/null || true\n\necho "[*] Fase 5/10: Port Scanning (Naabu)"\nnaabu -list "$OUTDIR/all_subs_final.txt" -top-ports 1000 -c "$THREADS" -silent -o "$OUTDIR/ports.txt" 2>/dev/null || true\n\necho "[*] Fase 6/10: HTTP Probing (HTTPX)"\nhttpx -l "$OUTDIR/all_subs_final.txt" -title -tech-detect -status-code -ip -cname -threads "$THREADS" -H "$HEADER" -silent -o "$OUTDIR/live_hosts.txt" || true\necho "    -> $(wc -l < "$OUTDIR/live_hosts.txt" 2>/dev/null || echo 0) host hidup"\n\necho "[*] Fase 7/10: URL Archive Mining (GAU + Waybackurls)"\ngau "$TARGET" --threads 5 --blacklist png,jpg,gif,css 2>/dev/null | uro > "$OUTDIR/gau_urls.txt" || true\nwaybackurls "$TARGET" 2>/dev/null | uro > "$OUTDIR/wayback_urls.txt" || true\n\necho "[*] Fase 8/10: JS Recon (SubJS + Nuclei Exposures)"\nsubjs -i "$OUTDIR/live_hosts.txt" -c 40 -silent > "$OUTDIR/js_files.txt" 2>/dev/null || true\n[ -s "$OUTDIR/js_files.txt" ] && nuclei -l "$OUTDIR/js_files.txt" -t http/exposures/ -silent -o "$OUTDIR/js_secrets.txt" 2>/dev/null || true\n\necho "[*] Fase 9/10: Content Discovery (Feroxbuster/FFUF)"\nferoxbuster -u "https://$TARGET" -t "$THREADS" -w "$WORDLIST" -x php,html,json,js,bak,old,txt --silent -o "$OUTDIR/ferox.txt" 2>/dev/null || ffuf -u "https://$TARGET/FUZZ" -w "$WORDLIST" -mc 200,301,302,403 -t "$THREADS" -H "$HEADER" -silent -o "$OUTDIR/ffuf.json" 2>/dev/null || true\n\necho "[*] Fase 10/10: Vulnerability Scan (Nuclei)"\nnuclei -l "$OUTDIR/live_hosts.txt" -t cves/ -t exposures/ -t takeovers/ -t misconfiguration/ -t default-logins/ -c "$THREADS" -H "$HEADER" -o "$OUTDIR/nuclei_results.txt" 2>/dev/null || true\n\necho ""\necho "[✓] Recon selesai! Ringkasan: $OUTDIR/"\necho "    Subs: $(wc -l < "$OUTDIR/all_subs_final.txt" 2>/dev/null || echo 0) | Live: $(wc -l < "$OUTDIR/live_hosts.txt" 2>/dev/null || echo 0) | Takeover: $(cat "$OUTDIR/takeover.txt" "$OUTDIR/takeover_nuclei.txt" 2>/dev/null | grep -c . || echo 0) | Nuclei: $(grep -c . "$OUTDIR/nuclei_results.txt" 2>/dev/null || echo 0)"\n';
   downloadFile(script,'recon_'+target+'.sh','application/x-sh');
 }
 
@@ -1703,6 +1892,9 @@ function bindEvents(){
   $('btnExportScopeMd').addEventListener('click',exportScopeMd);
 
   ['cmdTarget','cmdInputFile','cmdOutputDir','cmdThreads','cmdWordlist','cmdHeader'].forEach(function(id){ $(id).addEventListener('input',renderCommandCards); });
+  var cmdFilterEl = $('cmdCategoryFilter'); if(cmdFilterEl) cmdFilterEl.addEventListener('change',renderCommandCards);
+  var reconSearchEl = $('reconToolsSearch'); if(reconSearchEl) reconSearchEl.addEventListener('input',function(e){ filterToolCards('reconToolsGrid',e.target.value); });
+  var osintSearchEl = $('osintToolsSearch'); if(osintSearchEl) osintSearchEl.addEventListener('input',function(e){ filterToolCards('osintToolsGrid',e.target.value); });
   $('btnCopyAllCommands').addEventListener('click',function(){
     var t = nt($('cmdTarget').value)||'example.com', i = nt($('cmdInputFile').value)||'subdomains.txt', o = nt($('cmdOutputDir').value)||'recon_output', th = nt($('cmdThreads').value)||'50', w = nt($('cmdWordlist').value)||'/usr/share/wordlists/dir.txt', h = nt($('cmdHeader').value)||'X-Bug-Bounty: researcher';
     var all = COMMAND_TEMPLATES.map(function(cmd){return '# '+cmd.name+'\n'+cmd.build(t,i,o,th,w,h)}).join('\n\n');
