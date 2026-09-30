@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinuxPloiter — Bug Bounty Companion</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{color-scheme:dark;--bg-base:#0a0a0f;--bg-surface:#12121a;--bg-surface-elevated:#181824;--bg-input:#0e0e16;--page-background:radial-gradient(circle at top left,rgba(160,32,240,.12),transparent 28%),radial-gradient(circle at bottom right,rgba(0,229,255,.09),transparent 22%),linear-gradient(180deg,#0a0a0f 0%,#111120 100%);--panel-gradient:linear-gradient(180deg,rgba(18,18,26,.96),rgba(12,12,19,.96));--output-background:linear-gradient(180deg,rgba(14,14,22,.9),rgba(17,17,26,.9));--output-color:#d1d1e0;--border:#222233;--border-light:#2d2d42;--accent:#a020f0;--accent-light:#c040ff;--accent-dim:rgba(160,32,240,.15);--accent-glow:rgba(160,32,240,.35);--accent-cyan:#00e5ff;--accent-cyan-dim:rgba(0,229,255,.12);--accent-green:#10b981;--accent-green-dim:rgba(16,185,129,.15);--accent-red:#ef4444;--accent-red-dim:rgba(239,68,68,.15);--accent-amber:#f59e0b;--accent-amber-dim:rgba(245,158,11,.15);--text-main:#f0f0f5;--text-muted:#9595ad;--text-dim:#60607a;--on-accent:#fff;--font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;--font-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--radius-sm:6px;--radius-md:10px;--radius-lg:16px;--transition:all .2s cubic-bezier(.4,0,.2,1)}
+[data-theme="light"]{color-scheme:light;--bg-base:#f4f4fa;--bg-surface:#fff;--bg-surface-elevated:#eaeaf4;--bg-input:#f0f0f6;--page-background:#f4f4fa;--panel-gradient:linear-gradient(180deg,rgba(255,255,255,.96),rgba(245,245,250,.96));--output-background:#edf3f5;--output-color:#263744;--border:#d4d4e4;--border-light:#bcbccf;--accent:#a020f0;--accent-light:#7e22ce;--accent-dim:rgba(160,32,240,.08);--accent-glow:rgba(160,32,240,.15);--accent-cyan:#007c91;--accent-cyan-dim:rgba(0,124,145,.1);--accent-green:#087a53;--accent-green-dim:rgba(8,122,83,.1);--accent-red:#c62828;--accent-amber:#9a5a00;--text-main:#14141e;--text-muted:#5e5e78;--text-dim:#8b8b9e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--page-background);background-color:var(--bg-base);color:var(--text-main);font-family:var(--font-sans);font-size:15px;line-height:1.5;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:var(--bg-base)}::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:4px}::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+.app-container{max-width:1480px;width:100%;margin:0 auto;padding:18px 20px 60px;display:flex;flex-direction:column;gap:18px;flex:1}
+
+/* ============ HEADER ============ */
+header.app-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:18px 24px;background:var(--panel-gradient);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:0 12px 32px rgba(16,12,20,.45)}
+.brand{display:flex;align-items:center;gap:14px;flex-shrink:0;padding-top:4px}
+.brand-icon{width:46px;height:46px;background:linear-gradient(135deg,var(--accent),#ff007f);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;color:var(--on-accent);box-shadow:0 0 20px rgba(160,32,240,.25);flex-shrink:0}
+.brand-text h1{font-size:24px;font-weight:800;display:flex;align-items:center;gap:10px;line-height:1.2;letter-spacing:-.3px}
+.brand-text .panel-subtitle{font-size:13px;color:var(--text-muted);margin-top:3px}
+.badge{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px}
+.badge-purple{background:var(--accent-dim);color:var(--accent-light);border:1px solid var(--accent)}
+.badge-cyan{background:var(--accent-cyan-dim);color:var(--accent-cyan);border:1px solid rgba(0,229,255,.4)}
+.badge-green{background:var(--accent-green-dim);color:var(--accent-green);border:1px solid rgba(16,185,129,.4)}
+.badge-red{background:var(--accent-red-dim);color:var(--accent-red);border:1px solid rgba(239,68,68,.4)}
+.badge-amber{background:var(--accent-amber-dim);color:var(--accent-amber);border:1px solid rgba(245,158,11,.4)}
+
+/* Header actions: 2 baris rata kanan (atas = icon social, bawah = tools) */
+.header-actions{display:flex;flex-direction:column;align-items:flex-end;gap:12px;margin-left:auto}
+.header-actions-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+#communityLinksHeader{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+#communityLinksHeader a{display:inline-flex!important;align-items:center;justify-content:center;width:42px!important;height:42px!important;padding:0!important;font-size:20px;line-height:1;border-radius:var(--radius-md)!important;transition:var(--transition);flex-shrink:0;background:var(--bg-surface-elevated);border:1px solid var(--border);text-decoration:none;color:var(--text-main)}
+#communityLinksHeader a:hover{background:var(--accent-dim);border-color:var(--accent);transform:translateY(-1px)}
+.header-actions .btn,.header-actions select{height:42px;display:inline-flex;align-items:center;gap:7px;padding:0 16px;font-size:14px;font-weight:600;line-height:1;white-space:nowrap;flex-shrink:0;border-radius:var(--radius-md)}
+.header-actions .btn svg{width:18px;height:18px}
+.header-actions select{padding:0 34px 0 14px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--text-muted) 50%),linear-gradient(135deg,var(--text-muted) 50%,transparent 50%);background-position:calc(100% - 18px) 18px,calc(100% - 13px) 18px;background-size:6px 6px,6px 6px;background-repeat:no-repeat;background-color:var(--bg-surface-elevated);border:1px solid var(--border);color:var(--text-main);font-family:var(--font-sans);font-weight:600;font-size:14px;width:150px;min-width:150px;max-width:150px}
+#languageSelector{width:150px!important;min-width:150px!important;max-width:150px!important;text-overflow:ellipsis;overflow:hidden;font-size:14px;font-weight:600}
+#languageSelector option{width:150px;font-size:14px;padding:8px}
+#userAvatarDisplay{width:28px!important;height:28px!important;border-radius:50%;background:linear-gradient(135deg,var(--accent),#ff007f);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;overflow:hidden}
+#btnProfileModal{padding:0 8px!important;min-width:auto!important}
+
+/* ============ TAB NAV ============ */
+nav.tabs-nav{display:flex;align-items:center;gap:5px;overflow-x:auto;overflow-y:hidden;background:var(--bg-surface);border:1px solid var(--border);padding:7px;border-radius:var(--radius-lg);scrollbar-width:thin;scrollbar-color:var(--border-light) transparent;-webkit-overflow-scrolling:touch}
+nav.tabs-nav::-webkit-scrollbar{height:6px}
+nav.tabs-nav::-webkit-scrollbar-track{background:transparent}
+nav.tabs-nav::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px}
+.tab-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;font-size:14px;font-weight:600;color:var(--text-muted);background:transparent;border:none;border-radius:var(--radius-md);cursor:pointer;white-space:nowrap;transition:var(--transition);user-select:none;flex-shrink:0;line-height:1}
+.tab-btn:hover{color:var(--text-main);background:var(--bg-surface-elevated)}
+.tab-btn.active{color:#fff;background:linear-gradient(135deg,var(--accent),#8b3cf4);box-shadow:0 6px 14px var(--accent-glow)}
+
+main.content-area{position:relative}
+.tab-pane{display:none;flex-direction:column;gap:18px;animation:fadeIn .25s ease-out}
+.tab-pane.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.panel{background:var(--panel-gradient);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;box-shadow:0 18px 32px rgba(0,0,0,.28);display:flex;flex-direction:column;gap:16px;position:relative;overflow:hidden}
+.panel::before{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(160,32,240,.6),transparent);opacity:.7}
+.panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.panel-title{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px;color:var(--text-main)}
+.panel-subtitle{font-size:13px;color:var(--text-muted)}
+.collapsible{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface-elevated);overflow:hidden;margin-bottom:8px}
+.collapsible-trigger{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;font-weight:600;background:var(--bg-surface-elevated);border:none;width:100%;text-align:left;color:var(--text-main);font-size:14px}
+.collapsible-trigger:hover{background:rgba(255,255,255,.02)}
+.collapsible-content{padding:18px;border-top:1px solid var(--border);display:none;background:var(--bg-surface)}
+.collapsible.open .collapsible-content{display:block}
+.collapsible-icon{transition:transform .2s ease;display:inline-block}
+.collapsible.open .collapsible-icon{transform:rotate(180deg)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full-width{grid-column:1/-1}
+label{font-size:13px;font-weight:600;color:var(--text-muted);display:flex;align-items:center;justify-content:space-between}
+input[type="text"],input[type="password"],input[type="number"],input[type="email"],input[type="search"],select,textarea{width:100%;padding:11px 15px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-main);font-family:var(--font-sans);font-size:14px;transition:var(--transition);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow)}
+textarea{font-family:var(--font-mono);resize:vertical;min-height:80px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border-radius:var(--radius-md);font-size:14px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:var(--transition);text-decoration:none;white-space:nowrap;user-select:none}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#bf5af2);color:#fff;box-shadow:0 8px 18px var(--accent-glow)}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-secondary{background:var(--bg-surface-elevated);color:var(--text-main);border-color:var(--border)}
+.btn-secondary:hover{background:var(--border-light)}
+.btn-outline-accent{background:transparent;border-color:var(--accent);color:var(--accent-light)}
+.btn-outline-accent:hover{background:var(--accent-dim)}
+.btn-danger{background:var(--accent-red-dim);border-color:rgba(239,68,68,.4);color:var(--accent-red)}
+.btn-danger:hover{background:var(--accent-red);color:#fff}
+.btn-sm{padding:7px 12px;font-size:12px;border-radius:var(--radius-sm)}
+.chip-group{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:6px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:20px;font-size:13px;color:var(--text-muted);cursor:pointer;transition:var(--transition);user-select:none;display:inline-flex;align-items:center;gap:6px}
+.chip:hover{border-color:var(--accent);color:var(--text-main)}
+.chip.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent-light);font-weight:600}
+.utility-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.results-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:14px 0 8px}
+.results-filter{width:min(100%,320px);min-height:40px}
+.results-summary{color:var(--text-muted);font-size:13px;white-space:nowrap}
+.output-box{background:var(--output-background);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;font-family:var(--font-mono);font-size:13px;color:var(--output-color);max-height:400px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
+.dork-item{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.dork-item:hover{border-color:var(--border-light);background:var(--bg-surface-elevated)}
+.dork-text{font-family:var(--font-mono);font-size:13px;color:var(--accent-cyan);word-break:break-all;flex:1}
+.dork-actions{display:flex;align-items:center;gap:6px}
+.table-container{width:100%;overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-md)}
+table.data-table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}
+table.data-table th{background:var(--bg-surface-elevated);padding:11px 15px;font-weight:600;color:var(--text-muted);border-bottom:1px solid var(--border);white-space:nowrap}
+table.data-table td{padding:11px 15px;border-bottom:1px solid var(--border);color:var(--text-main);font-family:var(--font-mono)}
+table.data-table tr:hover td{background:rgba(160,32,240,.03)}
+.alert{padding:14px 18px;border-radius:var(--radius-md);font-size:13px;display:flex;align-items:flex-start;gap:12px;line-height:1.5}
+.alert-info{background:var(--accent-dim);border:1px solid rgba(160,32,240,.4);color:#dfb2ff}
+.alert-amber{background:var(--accent-amber-dim);border:1px solid rgba(245,158,11,.4);color:#fed7aa}
+.alert-cyan{background:var(--accent-cyan-dim);border:1px solid rgba(0,229,255,.3);color:#a5f3fc}
+.progress-wrapper{display:flex;flex-direction:column;gap:6px}
+.progress-bar{height:9px;background:var(--bg-input);border-radius:5px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-cyan));width:0%;transition:width .2s ease}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:999;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.active{display:flex}
+.modal-card{background:var(--bg-surface);border:1px solid var(--border-light);border-radius:var(--radius-lg);width:100%;max-width:650px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.8);animation:modalPop .2s ease-out}
+@keyframes modalPop{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-body{padding:22px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+.modal-footer{padding:16px 22px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:flex-end;gap:10px}
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:none}
+.drawer-overlay.active{display:block}
+.drawer{position:fixed;top:0;right:-440px;bottom:0;width:420px;max-width:90vw;background:var(--bg-surface);border-left:1px solid var(--border);z-index:1001;display:flex;flex-direction:column;transition:right .3s cubic-bezier(.16,1,.3,1);box-shadow:-5px 0 25px rgba(0,0,0,.7)}
+.drawer.active{right:0}
+.history-item{padding:12px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface-elevated);display:flex;flex-direction:column;gap:6px;font-size:13px;cursor:pointer}
+.history-item:hover{border-color:var(--accent)}
+.toast-container{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:9999;pointer-events:none}
+.toast{pointer-events:auto;min-width:280px;max-width:400px;padding:14px 18px;border-radius:var(--radius-md);background:var(--bg-surface-elevated);border:1px solid var(--border-light);box-shadow:0 4px 16px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;color:var(--text-main);animation:slideIn .25s ease-out forwards}
+.toast.toast-success{border-left:4px solid var(--accent-green)}
+.toast.toast-error{border-left:4px solid var(--accent-red)}
+.toast.toast-info{border-left:4px solid var(--accent)}
+.toast.toast-warning{border-left:4px solid var(--accent-amber)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.chart-container{position:relative;height:240px;width:100%}
+.metric-card{background:var(--bg-surface-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;gap:5px}
+.metric-card .metric-value{font-size:26px;font-weight:800;color:var(--accent-light)}
+.metric-card .metric-label{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.tool-card{background:var(--bg-surface-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tool-card:hover{border-color:var(--accent)}
+.tool-card .tool-name{font-weight:600;font-size:14px}
+.tool-card .tool-desc{font-size:12px;color:var(--text-muted);margin-top:2px}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.guide-header{padding:8px 2px 0}
+.guide-header h2{margin-bottom:4px;font-size:22px}
+.guide-header p,.guide-card p,.guide-card li{color:var(--text-muted);font-size:14px}
+.guide-start{padding:16px 18px;border-left:3px solid var(--accent-cyan);background:var(--bg-surface);color:var(--text-muted);border-radius:6px;font-size:14px}
+.guide-start strong{color:var(--text-main)}
+.guide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.guide-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:18px;border:1px solid var(--border);border-radius:8px;background:var(--bg-surface)}
+.guide-card h3{color:var(--text-main);font-size:16px}
+.guide-card ol{display:grid;gap:6px;padding-left:20px;margin:0}
+.guide-card .btn{margin-top:auto}
+.guide-note{padding:14px 16px;border:1px solid var(--accent-amber);border-radius:6px;color:var(--text-muted);background:var(--accent-amber-dim);font-size:13px}
+@media(max-width:900px){
+  .app-header{flex-direction:column;align-items:stretch;gap:14px}
+  .header-actions{justify-content:center;gap:12px;margin-left:0;align-items:center}
+  .header-actions-right{justify-content:center;width:100%}
+  #communityLinksHeader{width:100%;justify-content:center;padding:0;border-bottom:none;margin:0;flex-wrap:wrap}
+  #communityLinksHeader a{width:44px!important;height:44px!important;font-size:22px}
+  #languageSelector{width:140px!important;min-width:140px!important;max-width:140px!important;font-size:13px}
+  .tab-btn{padding:10px 14px;font-size:13px}
+  .brand-text h1{font-size:20px}
+}
+@media(max-width:768px){.guide-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<input type="file" id="importDorksFile" accept=".txt,.csv,.json" hidden>
+<input type="file" id="importDomainsFile" accept=".txt,.csv,.json" hidden>
+<input type="file" id="importSettingsFile" accept=".json" hidden>
+<input type="file" id="avatarUploadInput" accept="image/*" hidden>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="app-container">
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="brand-text">
+        <h1>LinuxPloiter <span class="badge badge-purple">BUG BOUNTY COMPANION</span></h1>
+        <div class="panel-subtitle">Client-Side OSINT & Bug Bounty Reconnaissance Workstation</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div id="communityLinksHeader"></div>
+      <div class="header-actions-right">
+        <button class="btn btn-secondary btn-sm" id="btnSettingsModal" title="API Keys">⚙️ API Keys</button>
+        <button class="btn btn-secondary btn-sm" id="btnHistoryDrawer" title="History">🕐 History (<span id="historyCount">0</span>)</button>
+        <button class="btn btn-secondary btn-sm" id="btnThemeToggle" title="Toggle Theme">🌓 Theme</button>
+        <button class="btn btn-secondary btn-sm" id="btnExportReportJson" title="Export JSON">📄 JSON</button>
+        <button class="btn btn-secondary btn-sm" id="btnExportReportCsv" title="Export CSV">📊 CSV</button>
+        <select id="languageSelector" title="Language">
+          <option value="id">🇮🇩 ID</option>
+          <option value="en">🇬🇧 EN</option>
+          <option value="es">🇪🇸 ES</option>
+          <option value="fr">🇫🇷 FR</option>
+          <option value="de">🇩🇪 DE</option>
+          <option value="pt">🇵🇹 PT</option>
+          <option value="ru">🇷🇺 RU</option>
+          <option value="ja">🇯🇵 JA</option>
+          <option value="zh">🇨🇳 ZH</option>
+          <option value="ar">🇸🇦 AR</option>
+        </select>
+        <button class="btn btn-secondary btn-sm" id="btnProfileModal" title="Profile">
+          <span id="userAvatarDisplay">
+            <img id="userAvatarImg" style="width:100%;height:100%;object-fit:cover;display:none">
+            <span id="userAvatarInitials">LP</span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs-nav" id="mainTabNav">
+    <button class="tab-btn active" data-tab="tab-dashboard">📊 Dashboard</button>
+    <button class="tab-btn" data-tab="tab-dork">🎯 Dork Generator</button>
+    <button class="tab-btn" data-tab="tab-google">🔍 Google API</button>
+    <button class="tab-btn" data-tab="tab-securitytxt">🛡️ security.txt</button>
+    <button class="tab-btn" data-tab="tab-shodan">🌐 Shodan</button>
+    <button class="tab-btn" data-tab="tab-censys">🔎 Censys</button>
+    <button class="tab-btn" data-tab="tab-h1scope">📋 H1 Scope</button>
+    <button class="tab-btn" data-tab="tab-commands">⌨️ Command Builder</button>
+    <button class="tab-btn" data-tab="tab-recon">🛠️ Recon Tools</button>
+    <button class="tab-btn" data-tab="tab-osint">🕵️ OSINT Tools</button>
+    <button class="tab-btn" data-tab="tab-bounty">🏆 Bounty Tracker</button>
+    <button class="tab-btn" data-tab="tab-report">📝 Report Generator</button>
+    <button class="tab-btn" data-tab="tab-error">⚠️ Error Analyzer</button>
+    <button class="tab-btn" data-tab="tab-guide">📖 Guide</button>
+  </nav>
+
+  <main class="content-area">
+
+    <section class="tab-pane active" id="tab-dashboard">
+      <div class="panel">
+        <div class="panel-header"><div><h2 class="panel-title">Dashboard — Real-time Recon Statistics</h2><div class="panel-subtitle">Ringkasan aktivitas kamu.</div></div></div>
+        <div class="metrics-grid" id="metricCards"></div>
+        <div class="dashboard-grid" style="margin-top:16px">
+          <div class="panel" style="padding:16px"><h3 class="panel-title" style="font-size:15px;margin-bottom:10px">Weekly Activity</h3><div class="chart-container"><canvas id="weeklyChart"></canvas></div></div>
+          <div class="panel" style="padding:16px"><h3 class="panel-title" style="font-size:15px;margin-bottom:10px">Tool Usage</h3><div class="chart-container"><canvas id="featuresChart"></canvas></div></div>
+          <div class="panel" style="padding:16px"><h3 class="panel-title" style="font-size:15px;margin-bottom:10px">Result Distribution</h3><div class="chart-container"><canvas id="donutChart"></canvas></div></div>
+        </div>
+        <div class="panel" style="padding:16px;margin-top:16px"><h3 class="panel-title" style="font-size:15px;margin-bottom:10px">Today's Stats</h3><div id="todayStats" class="metrics-grid"></div></div>
+        <div class="panel" style="padding:16px;margin-top:16px"><h3 class="panel-title" style="font-size:15px;margin-bottom:10px">Channel Performance</h3>
+          <div class="table-container"><table class="data-table"><thead><tr><th>Channel</th><th>Scans</th><th>Findings</th><th>Success Rate</th></tr></thead><tbody id="channelTableBody"><tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:20px">No data yet.</td></tr></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-pane" id="tab-dork">
+      <div class="panel">
+        <div class="panel-header"><div><h2 class="panel-title">Google Dork Generator</h2><div class="panel-subtitle">Buat query pencarian bertarget.</div></div><span class="badge badge-purple" id="dorkCountBadge">0 Dorks Ready</span></div>
+        <div class="form-grid">
+          <div class="form-group"><label>Dork Mode</label><select id="dorkMode"><option value="combo">Combo</option><option value="site_inurl">Site + InURL</option><option value="site_intext">Site + InText</option><option value="site_filetype">Site + Filetype</option><option value="intitle">InTitle</option><option value="inurl">InURL</option><option value="intext">InText</option><option value="programs_hunter">Bounty Hunter</option></select></div>
+          <div class="form-group"><label>Target Domain (Optional)</label><input type="text" id="dorkTargetDomain" placeholder="example.com"></div>
+          <div class="form-group"><label>Filetype</label><select id="dorkFiletype"><option value="">Any</option><option value="pdf">PDF</option><option value="txt">TXT</option><option value="json">JSON</option><option value="xml">XML</option><option value="doc">DOC</option><option value="env">ENV</option></select></div>
+        </div>
+        <div class="form-group"><label>Platforms</label><div class="chip-group" id="dorkPlatformChips">
+          <span class="chip active" data-val="hackerone.com">HackerOne</span><span class="chip active" data-val="bugcrowd.com">Bugcrowd</span><span class="chip active" data-val="intigriti.com">Intigriti</span><span class="chip active" data-val="yeswehack.com">YesWeHack</span><span class="chip" data-val="github.com">GitHub</span><span class="chip" data-val="gitlab.com">GitLab</span><span class="chip" data-val="pastebin.com">Pastebin</span>
+        </div></div>
+        <div class="form-group"><label>Paths</label><div class="chip-group" id="dorkPathChips">
+          <span class="chip active" data-val="/.well-known/security.txt">/.well-known/security.txt</span><span class="chip active" data-val="/security">/security</span><span class="chip active" data-val="/responsible-disclosure">/responsible-disclosure</span><span class="chip active" data-val="/bug-bounty">/bug-bounty</span><span class="chip" data-val="/security-policy">/security-policy</span><span class="chip" data-val="/whitehat">/whitehat</span>
+        </div></div>
+        <div class="form-group"><label>Keywords</label><div class="chip-group" id="dorkKeywordChips">
+          <span class="chip active" data-val='"bug bounty"'>"bug bounty"</span><span class="chip active" data-val='"responsible disclosure"'>"responsible disclosure"</span><span class="chip active" data-val='"security vulnerability"'>"security vulnerability"</span><span class="chip" data-val='"hall of fame"'>"hall of fame"</span><span class="chip" data-val='"swag"'>"swag"</span>
+        </div></div>
+        <div class="utility-row">
+          <button class="btn btn-primary" id="btnGenerateDorks">⚡ Generate Dorks</button>
+          <button class="btn btn-secondary" id="btnCopyAllDorks">Copy All</button>
+          <button class="btn btn-secondary" id="btnImportDorksFile">Import</button>
+          <button class="btn btn-secondary" id="btnExportDorksTxt">.TXT</button>
+          <button class="btn btn-secondary" id="btnExportDorksJson">.JSON</button>
+          <button class="btn btn-secondary" id="btnExportDorksCsv">.CSV</button>
+          <button class="btn btn-secondary" id="btnExportDorksMd">.MD</button>
+        </div>
+        <div><label style="margin-bottom:8px">Generated (<span id="dorkResultCount">0</span>)</label><div id="dorkResultsList" style="max-height:480px;overflow-y:auto"><div style="color:var(--text-dim);text-align:center;padding:30px">Klik "Generate Dorks".</div></div></div>
+      </div>
+    </section>
+
+    <section class="tab-pane" id="tab-google">
+      <div class="panel">
+        <div class="panel-header"><div><h2 class="panel-title">Google Custom Search API</h2><div class="panel-subtitle">Program discovery via Google JSON API.</div></div></div>
+        <div class="alert alert-cyan"><div>Dapatkan API Key & CX gratis di Google Programmable Search.</div></div>
+        <div class="form-grid">
+          <div class="form-group"><label>Google API Key</label><input type="password" id="googleApiKey" placeholder="AIzaSy..."></div>
+          <div class="form-group"><label>CX ID</label><input type="text" id="googleCx" placeholder="a1b2c3..."></div>
+          <div class="form-group full-width"><label>Query</label><div style="display:flex;gap:8px"><input type="text" id="googleQuery" placeholder='site:hackerone.com inurl:/security'><button class="btn btn-primary" id="btnExecuteGoogleSearch">Search</button></div></div>
+        </div>
+        <div id="googleSearchStatus" style="display:none" class="alert alert-info">Searching...</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><label>Results (<span id="googleResultCount">0</span>)</label><div style="display:flex;gap:6px"><button class="btn btn-secondary btn-sm" id="btnCopyGoogleLinks">Copy URLs</button><button class="btn btn-secondary btn-sm" id="btnExportGoogleJson">JSON</button></div></div>
+        <div id="googleResultsList" style="display:flex;flex-direction:column;gap:10px;max-height:450px;overflow-y:auto"><div style="color:var(--text-dim);text-align:center;padding:30px">Masukkan API Key dan CX.</div></div>
+      </div>
+    </section>
+
+    <section class="tab-pane" id="tab-securitytxt">
+      <div class="panel">
+        <div class="panel-header"><div><h2 class="panel-title">security.txt Batch Scanner</h2><div class="panel-subtitle">Scan banyak domain untuk security.txt.</div></div>
+          <div class="chip-group"><span class="badge badge-purple" id="scanStatTotal">Total: 0</span><span class="badge badge-green" id="scanStatFound">Found: 0</span><span class="badge badge-red" id="scanStatNotFound">Not Found: 0</span><span class="badge badge-amber" id="scanStatError">Errors: 0</span></div>
+        </div>
+        <div class="alert alert-amber"><div>Browser CORS bisa block request. Aktifkan CORS Proxy di Settings jika perlu.</div></div>
+        <div class="form-grid">
+          <div class="form-group full-width"><label>Target Domains (satu per baris)</label><textarea id="securityTxtDomains" rows="5" placeholder="google.com&#10;github.com&#10;hackerone.com"></textarea></div>
+          <div class="form-group"><label>Concurrency: <span id="concurrencyValue">4</span></label><input type="range" id="scanConcurrency" min="1" max="10" value="4"></div>
+          <div class="form-group"><label>Timeout: <span id="timeoutValue">4000</span> ms</label><input type="range" id="scanTimeout" min="1000" max="15000" step="500" value="4000"></div>
+          <div class="form-group"><label>Path</label><select id="scanPathChoice"><option value="both">Both</option><option value="wellknown">/.well-known only</option><option value="root">/security.txt only</option></select></div>
+        </div>
+        <div class="utility-row">
+          <button class="btn btn-primary" id="btnStartSecurityScan">Start Scan</button>
+          <button class="btn btn-danger" id="btnStopSecurityScan" disabled>Stop</button>
+          <button class="btn btn-secondary" id="btnImportDomainsFile">Import</button>
+          <button class="btn btn-secondary" id="btnClearSecurityResults">Clear</button>
+          <button class="btn btn-secondary" id="btnExportSecurityCsv">CSV</button>
+          <button class="btn btn-secondary" id="btnExportSecurityJson">JSON</button>
+        </div>
+        <div class="progress-wrapper" id="scanProgressWrapper" style="display:none"><div style="display:flex;justify-content:space-between;font-size:13px"><span>Scanning...</span><span id="scanProgressPercent">0%</span></div><div class="progress-bar"><div class="progress-fill" id="scanProgressFill"></div></div></div>
+        <div class="table-container"><table class="data-table"><thead><tr><th>Domain</th><th>Status</th><th>Path</th><th>Latency</th><th>Contacts</th><th>Actions</th></tr></thead><tbody id="securityResultsBody"><tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:24px">Belum ada scan.</td></tr></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="tab-pane" id="tab-shodan">
+      <div class="panel">
+        <div class="panel-header"><div><h2 class="panel-title">Shodan Host Intelligence</h2><div class="panel-subtitle">Cari aset terhubung internet.</div></div><span class="badge badge-purple" id="shodanCountBadge">0 Hosts</span></div>
+        <div class="form-grid">
+          <div class="form-group"><label>Shodan API Key</label><input type="password" id="shodanApiKey" placeholder="API Key"></div>
+          <div class="form-group full-width"><label>Query</label><div style="display:flex;gap:8px"><input type="text" id="shodanQuery" placeholder='org:"Target"'><button class="btn btn-primary" id="btnExecuteShodan">Search</button></div></div>
+        </div>
+        <div class="form-group"><label>Presets</label><div class="chip-group">
+          <span class="chip" data-shodan-preset='ssl:"target.com"'>ssl</span>
+          <span class="chip" data-shodan-preset='hostname:"target.com"'>hostname</span>
+          <span class="chip" data-shodan-preset='org:"Tesla"'>org</span>
+          <span class="chip" data-shodan-preset='http.title:"Index of /"'>Index of /</span>
+          <span class="chip" data-shodan-preset='product:"Apache Tomcat"'>Tomcat</span>
+          <span class="chip" data-shodan-preset='port:8443,8080'>Dev Ports</span>
+        </div></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-secondary btn-sm" id="btnCopyShodanIps">Copy IPs</button><button class="btn btn-secondary btn-sm" id="btnExportShodanJson">JSON</button><button class="btn btn-secondary btn-sm" id="btnExportShodanCsv">CSV</button></div>
+        <div id="shodanResultsList" style="display:flex;flex-direction:column;gap:10px;margin-top:12px;max-height:480px;overflow-y:auto"><div style="color:var(--text-dim);text-align:center;padding:30px">Masukkan API key dan query.</div></div>
+      </div>
+    </section>
+
+    <section class="tab-pane" id="tab-censys">
+      <div class="panel">
+        <div class="panel-header"><div><h2 class="panel-title">Censys Search (Hosts API v2)</h2><div class="panel-subtitle">Discover infrastructure and TLS certificates.</div></div><span class="badge badge-purple" id="censysCountBadge">0 Hosts</span></div>
+        <div class="form-grid">
+          <div class="form-group"><label>Censys API ID</label><input type="text" id="censysApiId"></div>
+          <div class="form-group"><label>Censys API Secret</label><input type="password" id="censysApiSecret"></div>
+          <div class="form-group full-width"><label>Query</label><div style="display:flex;gap:8px"><input type="text" id="censysQuery" placeholder='names: example.com'><button class="btn btn-primary" id="btnExecuteCensys">Search</button></div></div>
+        </div>
+        <div class="form-group"><label>Presets</label><div class="chip-group">
+          <span class="chip" data-censys-preset='names: example.com'>names</span>
+          <span class="chip" data-censys-preset='services.http.response.headers.location: *example.com*'>HTTP redirects</span>
+          <span class="chip" data-censys-preset='services.tls.certificates.leaf_data.names: example.com'>TLS Leaf</span>
+          <span class="chip" data-censys-preset='autonomous_system.name: "CLOUDFLARE"'>AS Name</span>
+        </div></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-secondary btn-sm" id="btnCopyCensysIps">Copy IPs</button><button class="btn btn-secondary btn-sm" id="btnExportCensysJson">JSON</button><button class="btn btn-secondary btn-sm" id="btnExportCensysCsv">CSV</button></div>
+        <div id="censysResultsList" style="display:flex;flex-direction:column;gap:10px;margin-top:12px;max-height:480px;overflow-y:auto"><div style="color:var(--text-dim);text-align:center;padding:30px">Masukkan API ID dan Secret.</div></div>
+      </div>
+    </section>
+
+    <section class="tab-pane" id="tab-h1scope">
+      <div class="panel">
+        <div class="panel-header"><div><h2 class="panel-title">HackerOne Scope Extractor</h2><div class="panel-subtitle">Parse in-scope dan out-of-scope.</div></div>
+          <div class="chip-group"><span class="badge badge-green" id="h1InScopeCount">0 In-Scope</span><span class="badge badge-red" id="h1OutScopeCount">0 Out-of-Scope</span></div>
+        </div>
+        <div class="form-grid"><div class="form-group full-width"><label>HackerOne Handle</label><div style="display:flex;gap:8px"><input type="text" id="h1Handle" placeholder="security, shopify"><button class="btn btn-primary" id="btnFetchH1Scope">Fetch</button><button class="btn btn-secondary" id="btnLoadSampleH1">Load Sample</button></div></div></div>
+        <div class="form-group"><label>Popular</label><div class="chip-group">
+          <span class="chip" data-h1-handle="security">security</span><span class="chip" data-h1-handle="shopify">shopify</span><span class="chip" data-h1-handle="valve">valve</span><span class="chip" data-h1-handle="gitlab">gitlab</span><span class="chip" data-h1-handle="slack">slack</span>
+        </div></div>
+        <div class="collapsible" id="colScopeImport"><button class="collapsible-trigger" type="button"><span>Atau Paste Raw scope.json</span><span class="collapsible-icon">▼</span></button><div class="collapsible-content"><textarea id="h1CustomJson" rows="4" placeholder='{"targets":{"in_scope":[...]}}'></textarea><div style="margin-top:8px"><button class="btn btn-secondary btn-sm" id="btnParseCustomH1Json">Parse JSON</button></div></div></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" id="btnCopyInScopeDomains">Copy Domains</button><button class="btn btn-outline-accent btn-sm" id="btnSendToScanner">→ Scanner</button><button class="btn btn-outline-accent btn-sm" id="btnSendToCommands">→ Commands</button><button class="btn btn-secondary btn-sm" id="btnExportScopeCsv">CSV</button><button class="btn btn-secondary btn-sm" id="btnExportScopeMd">MD</button></div>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-top:8px">
+          <div><h3 style="font-size:15px;color:var(--accent-green);margin-bottom:6px">In-Scope</h3><div class="table-container"><table class="data-table"><thead><tr><th>Target</th><th>Type</th><th>Bounty</th><th>Severity</th><th>Instructions</th></tr></thead><tbody id="h1InScopeBody"><tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:20px">Belum ada in-scope assets.</td></tr></tbody></table></div></div>
+          <div><h3 style="font-size:15px;color:var(--accent-red);margin-bottom:6px">Out-of-Scope</h3><div class="table-container"><table class="data-table"><thead><tr><th>Target</th><th>Type</th><th>Reason</th></tr></thead><tbody id="h1OutScopeBody"><tr><td colspan="3" style="text-align:center;color:var(--text-dim);padding:20px">Belum ada out-of-scope assets.</td></tr></tbody></table></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-pane" id="tab-commands">
+      <div class="panel">
+        <div class="panel-header"><div><h2 class="panel-title">CLI Command Builder</h2><div class="panel-subtitle">Generate perintah recon.</div></div></div>
+        <div class="form-grid">
+          <div class="form-group"><label>Target</label><input type="text" id="cmdTarget" value="example.com"></div>
+          <div class="form-group"><label>Input File</label><input type="text" id="cmdInputFile" value="subdomains.txt"></div>
+          <div class="form-group"><label>Output Dir</label><input type="text" id="cmdOutputDir" value="recon_output"></div>
+          <div class="form-group"><label>Threads</label><input type="number" id="cmdThreads" value="50" min="1" max="500"></div>
+          <div class="form-group"><label>Wordlist</label><input type="text" id="cmdWordlist" value="/usr/share/wordlists/dir.txt"></div>
+          <div class="form-group"><label>Custom Header</label><input type="text" id="cmdHeader" value="X-Bug-Bounty: researcher"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:4px"><button class="btn btn-primary" id="btnDownloadReconScript">⬇ Download .sh Script</button><button class="btn btn-secondary" id="btnCopyAllCommands">Copy All Pipelines</button></div>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:10px" id="commandCardsContainer"></div>
+      </div>
+    </section>
+
+    <section class="tab-pane" id="tab-recon">
+      <div class="panel">
+        <div class="panel-header"><div><h2 class="panel-title">Recon Tools — 14 Utilities</h2><div class="panel-subtitle">Klik Run — command disalin atau URL dibuka.</div></div></div>
+        <div class="tools-grid" id="reconToolsGrid"></div>
+      </div>
+    </section>
+
+    <section class="tab-pane" id="tab-osint">
+      <div class="panel">
+        <div class="panel-header"><div><h2 class="panel-title">OSINT Tools — 5 Utilities</h2><div class="panel-subtitle">Open-source intelligence gathering.</div></div></div>
+        <div class="tools-grid" id="osintToolsGrid"></div>
+      </div>
+    </section>
+
+    <section class="tab-pane" id="tab-bounty">
+      <div class="panel">
+        <div class="panel-header"><div><h2 class="panel-title">Bounty Tracker</h2><div class="panel-subtitle">Track submitted vulnerabilities.</div></div><button class="btn btn-primary btn-sm" id="btnAddBountyEntry">+ Add Entry</button></div>
+        <div class="table-container"><table class="data-table"><thead><tr><th>Program</th><th>Vulnerability</th><th>Severity</th><th>Status</th><th>Reward</th><th>Date</th><th>Actions</th></tr></thead><tbody id="bountyTrackerBody"><tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:20px">Belum ada entries.</td></tr></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="tab-pane" id="tab-report">
+      <div class="panel">
+        <div class="panel-header"><div><h2 class="panel-title">Report Generator</h2><div class="panel-subtitle">Generate vulnerability report.</div></div></div>
+        <div class="form-grid">
+          <div class="form-group"><label>Program</label><input type="text" id="reportProgram" placeholder="HackerOne Program"></div>
+          <div class="form-group"><label>Title</label><input type="text" id="reportTitle" placeholder="Reflected XSS"></div>
+          <div class="form-group"><label>Severity</label><select id="reportSeverity"><option>Critical</option><option>High</option><option>Medium</option><option>Low</option><option>Informational</option></select></div>
+          <div class="form-group full-width"><label>Description</label><textarea id="reportDescription" rows="3"></textarea></div>
+          <div class="form-group full-width"><label>Steps to Reproduce</label><textarea id="reportSteps" rows="3"></textarea></div>
+          <div class="form-group full-width"><label>Impact</label><textarea id="reportImpact" rows="2"></textarea></div>
+          <div class="form-group full-width"><label>Remediation</label><textarea id="reportRemediation" rows="2"></textarea></div>
+        </div>
+        <div style="display:flex;gap:10px"><button class="btn btn-primary" id="btnGenerateReport">Generate</button><button class="btn btn-secondary" id="btnCopyReport">Copy</button><button class="btn btn-secondary" id="btnDownloadReportMd">MD</button><button class="btn btn-secondary" id="btnDownloadReportJson">JSON</button></div>
+        <div class="output-box" id="reportOutput" style="min-height:120px">Report akan muncul di sini...</div>
+      </div>
+    </section>
+
+    <section class="tab-pane" id="tab-error">
+      <div class="panel">
+        <div class="panel-header"><div><h2 class="panel-title">Error Analyzer</h2><div class="panel-subtitle">Pattern DB + AI fallback (Gemini/Groq).</div></div></div>
+        <div class="form-group full-width"><label>Error Message / Stack Trace</label><textarea id="errorInput" rows="6" placeholder="Paste error di sini..."></textarea></div>
+        <div style="display:flex;gap:10px"><button class="btn btn-primary" id="btnAnalyzeError">Analyze</button><button class="btn btn-secondary" id="btnClearError">Clear</button></div>
+        <div class="output-box" id="errorOutput" style="min-height:120px">Analisis akan muncul di sini...</div>
+      </div>
+    </section>
+
+    <section class="tab-pane" id="tab-guide" aria-labelledby="guideTitle">
+      <div class="guide-header">
+        <h2 class="panel-title" id="guideTitle">Panduan LinuxPloiter Recon Suite</h2>
+        <p>Ringkasan fungsi, langkah penggunaan, dan batasan tiap alat.</p>
+      </div>
+      <div class="guide-start">
+        <strong>Alur singkat:</strong> pastikan target termasuk scope yang diizinkan, pilih alat, isi target atau query, jalankan pencarian, lalu tinjau dan ekspor hasil. Tidak semua fitur memerlukan API key.
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <input type="search" id="guideSearch" placeholder="Cari panduan..." aria-label="Search guide">
+      </div>
+      <div class="guide-grid" id="guideGrid"></div>
+      <div class="guide-note">
+        Data pengaturan disimpan di localStorage browser. File ekspor pengaturan dapat berisi API key, jadi simpan dengan aman. CORS proxy pihak ketiga dapat melihat request yang diteruskan.
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-card">
+    <div class="modal-header"><h3 class="panel-title">API Key Management & CORS Proxy</h3><button class="btn btn-secondary btn-sm" id="btnCloseSettingsModal">✕</button></div>
+    <div class="modal-body">
+      <div class="alert alert-info">Keys disimpan di localStorage. Tidak ada server eksternal yang menerima token kamu.</div>
+      <div class="form-group"><label>CORS Proxy Prefix</label><input type="text" id="settingCorsProxy" placeholder="https://corsproxy.io/?"></div>
+      <div class="form-group"><label>Google API Key</label><input type="password" id="modalGoogleApiKey"></div>
+      <div class="form-group"><label>Google CX</label><input type="text" id="modalGoogleCx"></div>
+      <div class="form-group"><label>Shodan API Key</label><input type="password" id="modalShodanApiKey"></div>
+      <div class="form-group"><label>Censys API ID</label><input type="text" id="modalCensysId"></div>
+      <div class="form-group"><label>Censys API Secret</label><input type="password" id="modalCensysSecret"></div>
+      <div class="form-group"><label>Gemini API Key</label><input type="password" id="modalGeminiKey" placeholder="AIza..."></div>
+      <div class="form-group"><label>Groq API Key</label><input type="password" id="modalGroqKey" placeholder="gsk_..."></div>
+      <div class="form-group"><label>Vulners API Key</label><input type="password" id="modalVulnersKey"></div>
+      <div class="form-group"><label>NVD API Key</label><input type="password" id="modalNvdKey"></div>
+      <div class="form-group"><label>HackerOne Token</label><input type="password" id="modalH1Token"></div>
+      <div class="form-group"><label>Bugcrowd Token</label><input type="password" id="modalBugcrowdToken"></div>
+      <div class="form-group"><label>Intigriti Token</label><input type="password" id="modalIntigritiToken"></div>
+      <div class="form-group"><label>YesWeHack Token</label><input type="password" id="modalYesWeHackToken"></div>
+      <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:8px"><h4 style="font-size:14px;margin-bottom:8px">Support LinuxPloiter</h4><div id="donationLinks"></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="btnClearAllKeys">Clear Keys</button>
+      <button class="btn btn-secondary btn-sm" id="btnExportSettingsJson">Export</button>
+      <button class="btn btn-secondary btn-sm" id="btnImportSettingsJson">Import</button>
+      <button class="btn btn-secondary btn-sm" id="btnResetDefaultSettings">Reset</button>
+      <button class="btn btn-primary" id="btnSaveSettings">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="inspectorModal">
+  <div class="modal-card">
+    <div class="modal-header"><h3 class="panel-title" id="inspectorTitle">Inspector</h3><button class="btn btn-secondary btn-sm" id="btnCloseInspector">✕</button></div>
+    <div class="modal-body"><div class="output-box" id="inspectorContent" style="max-height:500px"></div></div>
+    <div class="modal-footer"><button class="btn btn-secondary" id="btnCopyInspector">Copy Raw</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="profileModal">
+  <div class="modal-card" style="max-width:640px">
+    <div class="modal-header">
+      <h3 class="panel-title">Tentang LinuxPloiter</h3>
+      <button class="btn btn-secondary btn-sm" id="btnCloseProfileModal">✕</button>
+    </div>
+    <div class="modal-body" style="gap:20px">
+
+      <!-- Avatar + Nama -->
+      <div style="display:flex;align-items:center;gap:18px">
+        <img src="https://i.pinimg.com/736x/ad/90/8a/ad908aa4dd8154bfb93bbd30b216b460.jpg"
+             alt="LinuxPloiter"
+             style="width:88px;height:88px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);box-shadow:0 0 24px var(--accent-glow);flex-shrink:0">
+        <div>
+          <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">LinuxPloiter</h2>
+          <div style="font-size:13px;color:var(--text-muted);line-height:1.5">
+            Bug Bounty Companion · <span class="badge badge-purple" style="font-size:10px">v6.0</span>
+          </div>
+          <div style="font-size:12px;color:var(--accent-cyan);margin-top:6px;font-family:var(--font-mono)">
+            Client-Side OSINT & Reconnaissance Workstation
+          </div>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div style="padding:16px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);line-height:1.65;color:var(--text-muted);font-size:14px">
+        <h3 style="color:var(--text-main);font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px">🐧</span> Apa itu LinuxPloiter?
+        </h3>
+        <p style="margin-bottom:10px">
+          <strong style="color:var(--accent-light)">LinuxPloiter</strong> adalah <em>workstation recon client-side</em> — semua berjalan di browser kamu, tanpa server, tanpa tracking. Cocok untuk <strong>bug hunter</strong>, <strong>security researcher</strong>, dan <strong>pentester</strong> yang butuh tool ringan untuk reconnaissance awal.
+        </p>
+        <p>
+          Kami hadir untuk <strong>semua yang cinta teknologi, keamanan, dan AI</strong> — dengan tutorial yang gampang diikuti. Dari <em>perintah Linux</em> sampai <em>strategi cyber defense</em>, dari <em>Bug Bounty</em> sampai <em>DevOps</em> & <em>otomasi AI</em>.
+        </p>
+      </div>
+
+      <!-- Why built -->
+      <div style="padding:16px;background:var(--accent-dim);border:1px solid rgba(160,32,240,.3);border-radius:var(--radius-md);line-height:1.65;color:var(--text-muted);font-size:14px">
+        <h3 style="color:var(--accent-light);font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px">🎯</span> Kenapa dibangun?
+        </h3>
+        <ul style="padding-left:20px;display:grid;gap:6px">
+          <li>Tool recon simpel, cepat, dan bisa dipakai <strong>di mana saja</strong> — cukup buka browser.</li>
+          <li><strong>Gratis</strong> &amp; <strong>open</strong> — bukan pengganti Burp Suite / nuclei, tapi melengkapi workflow kamu.</li>
+          <li><strong>Privasi nomor satu</strong> — semua data di localStorage, tidak ada yang dikirim ke server.</li>
+          <li>Belajar sambil praktik — setiap tool ada panduan singkat di tab <strong>Guide</strong>.</li>
+        </ul>
+      </div>
+
+      <!-- What we cover -->
+      <div style="padding:16px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);line-height:1.65;color:var(--text-muted);font-size:14px">
+        <h3 style="color:var(--text-main);font-size:15px;margin-bottom:10px">📍 Yang kami cover</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px">
+          <div style="padding:8px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;font-size:13px">🖥️ IT Infrastructure</div>
+          <div style="padding:8px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;font-size:13px">🎯 Bug Bounty</div>
+          <div style="padding:8px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;font-size:13px">🌐 Network Engineering</div>
+          <div style="padding:12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;font-size:13px">🤖 AI &amp; Automation</div>
+          <div style="padding:12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;font-size:13px">🐧 Linux Commands</div>
+          <div style="padding:12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;font-size:13px">🛡️ Cyber Defense</div>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:var(--text-dim);font-style:italic;text-align:center">
+          *Weekend update* — atau *saat ada waktu luang*
+        </div>
+      </div>
+
+      <!-- Donate -->
+      <div style="padding:16px;background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(160,32,240,.08));border:1px solid var(--border);border-radius:var(--radius-md);text-align:center">
+        <h3 style="color:var(--text-main);font-size:15px;margin-bottom:6px">💖 Dukung LinuxPloiter</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
+          Kalau tool ini membantu, traktir saya kopi ☕ biar tetap gratis &amp; terus dikembangkan.
+        </p>
+        <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
+          <a href="https://www.paypal.com/donate" target="_blank" rel="noopener noreferrer"
+             class="btn btn-primary" style="text-decoration:none;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.24 1.516a.56.56 0 0 0 .554.647h3.882c.46 0 .85-.334.922-.788.06-.26.76-4.852.816-5.09a.932.932 0 0 1 .923-.788h.58c3.76 0 6.705-1.528 7.565-5.946.36-1.847.174-3.388-.777-4.471z"/>
+            </svg>
+            Donasi via PayPal
+          </a>
+          <button class="btn btn-secondary" data-copy-text="bc1qlinuxploiterxxxxxxxxxxxxxxxxxxxxxx" data-copy-label="Bitcoin address copied!">
+            ₿ Copy Bitcoin Address
+          </button>
+        </div>
+      </div>
+
+      <!-- Legal note -->
+      <div style="padding:12px 14px;background:var(--accent-amber-dim);border:1px solid rgba(245,158,11,.4);border-radius:6px;font-size:12px;color:#fed7aa;line-height:1.5">
+        <strong>⚠️ Legal notice:</strong> Gunakan hanya untuk target yang kamu punya izin (scope program bug bounty, lab sendiri, atau domain milikmu). Segala penyalahgunaan adalah tanggung jawab pengguna sepenuhnya.
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">🐙 GitHub</a>
+      <a href="https://x.com" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">🐦 Twitter</a>
+      <a href="https://discord.com" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">💬 Discord</a>
+      <button class="btn btn-primary" id="btnCloseProfileModalBottom">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<div class="drawer-overlay" id="historyOverlay"></div>
+<div class="drawer" id="historyDrawer">
+  <div class="modal-header"><h3 class="panel-title">Recon Activity History</h3><button class="btn btn-secondary btn-sm" id="btnCloseHistoryDrawer">✕</button></div>
+  <div style="padding:12px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:var(--text-muted)">Recent actions</span><button class="btn btn-danger btn-sm" id="btnClearHistory">Clear</button></div>
+  <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px" id="historyListContainer"><div style="text-align:center;color:var(--text-dim);padding:30px">Belum ada history.</div></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+var SK = {
+  API_KEYS:'linuxploiter_api_keys', HISTORY:'linuxploiter_history', THEME:'linuxploiter_theme',
+  STATS:'linuxploiter_stats', FORM_STATE:'linuxploiter_form_state', BOUNTY:'linuxploiter_bounty_tracker',
+  PROFILE:'linuxploiter_user_profile', LANG:'linuxploiter_lang'
+};
+
+var generatedDorksCache = [];
+var googleResultsCache = [];
+var scannedResultsList = [];
+var shodanResultsCache = [];
+var censysResultsCache = [];
+var currentInScopeAssets = [];
+var currentOutScopeAssets = [];
+var activeScanAbortController = null;
+var currentLang = localStorage.getItem(SK.LANG) || 'id';
+var weeklyChartInstance = null, featuresChartInstance = null, donutChartInstance = null;
+
+function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function attr(s){return esc(String(s==null?'':s))}
+function nt(v){return String(v==null?'':v).trim()}
+function nd(v){return nt(v).replace(/^https?:\/\//i,'').replace(/\/$/,'').replace(/\/.*$/,'').replace(/\?.*$/,'').trim()}
+function parseDomainList(raw){return Array.from(new Set(nt(raw).split(/\r?\n|,/).map(nd).filter(Boolean).filter(function(d){return /^[a-z0-9.-]+\.[a-z]{2,}(?:\.[a-z]{2,})?$/i.test(d)||d==='localhost'})))}
+function $(id){return document.getElementById(id)}
+
+function showToast(message,type){
+  type = type || 'info';
+  var container = $('toastContainer'); if(!container) return;
+  var toast = document.createElement('div');
+  toast.className = 'toast toast-'+type;
+  var icon = '';
+  if(type==='success') icon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+  else if(type==='error') icon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+  else if(type==='warning') icon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/></svg>';
+  else icon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+  toast.innerHTML = '<div style="display:flex;align-items:center;gap:10px">'+icon+'<span>'+esc(message)+'</span></div><button style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:14px" onclick="this.parentElement.remove()">✕</button>';
+  container.appendChild(toast);
+  setTimeout(function(){if(toast.parentElement){toast.style.opacity='0';toast.style.transform='translateX(100%)';toast.style.transition='all .3s ease';setTimeout(function(){toast.remove()},300)}},3500);
+}
+
+async function copyToClipboard(text,label){
+  label = label || 'Copied to clipboard!';
+  try{
+    if(navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
+    else { var t=document.createElement('textarea'); t.value=text; t.style.position='fixed'; t.style.left='-999999px'; document.body.appendChild(t); t.focus(); t.select(); document.execCommand('copy'); t.remove(); }
+    showToast(label,'success');
+  }catch(e){ showToast('Failed to copy','error'); }
+}
+
+function downloadFile(content,filename,mime){
+  mime = mime || 'text/plain;charset=utf-8';
+  try{
+    var blob = new Blob([content],{type:mime});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Saved '+filename,'success');
+  }catch(e){ showToast('Error exporting file','error'); }
+}
+
+function loadSavedKeys(){ try{ var r=localStorage.getItem(SK.API_KEYS); return r?JSON.parse(r):{}; }catch(e){ return {}; } }
+function saveKeys(k){ localStorage.setItem(SK.API_KEYS,JSON.stringify(k)); showToast('Configuration saved','success'); }
+function getCorsProxy(){ return (loadSavedKeys().corsProxy||'').trim(); }
+function wrapWithCorsProxy(url){
+  var p = getCorsProxy();
+  if(!p) return url;
+  p = p.replace(/\/+$/,'');
+  if(p.indexOf('?')>-1) return p+'&url='+encodeURIComponent(url);
+  return p+'/?url='+encodeURIComponent(url);
+}
+
+function getStats(){ try{ var r=localStorage.getItem(SK.STATS); return r?JSON.parse(r):{scans:0,findings:0,dorks:0,tools:{},daily:{},channels:{}}; }catch(e){ return {scans:0,findings:0,dorks:0,tools:{},daily:{},channels:{}}; } }
+function recordStat(key,inc){ inc = inc||1; var s=getStats(); s[key]=(s[key]||0)+inc;
+  var today=new Date().toISOString().slice(0,10);
+  if(!s.daily[today]) s.daily[today]={scans:0,findings:0};
+  if(key==='scans') s.daily[today].scans+=inc;
+  if(key==='findings') s.daily[today].findings+=inc;
+  localStorage.setItem(SK.STATS,JSON.stringify(s));
+}
+function recordToolUsage(tool){ var s=getStats(); if(!s.tools)s.tools={}; s.tools[tool]=(s.tools[tool]||0)+1; localStorage.setItem(SK.STATS,JSON.stringify(s)); }
+function recordChannelStat(ch,found){ var s=getStats(); if(!s.channels)s.channels={}; if(!s.channels[ch])s.channels[ch]={scans:0,findings:0}; s.channels[ch].scans++; if(found)s.channels[ch].findings++; localStorage.setItem(SK.STATS,JSON.stringify(s)); }
+
+function getHistory(){ try{ var r=localStorage.getItem(SK.HISTORY); return r?JSON.parse(r):[]; }catch(e){ return []; } }
+function addHistoryItem(tab,query,details){ try{ var h=getHistory(); h.unshift({id:Date.now(),tab:tab,query:query,details:details||'',timestamp:new Date().toLocaleTimeString()}); if(h.length>50)h.pop(); localStorage.setItem(SK.HISTORY,JSON.stringify(h)); renderHistory(); }catch(e){} }
+function renderHistory(){
+  var list = getHistory();
+  var container = $('historyListContainer');
+  var badge = $('historyCount');
+  if(badge) badge.textContent = list.length;
+  if(!container) return;
+  if(!list.length){ container.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:30px">Belum ada history.</div>'; return; }
+  container.innerHTML = list.map(function(item){
+    return '<div class="history-item"><div style="display:flex;justify-content:space-between;align-items:center"><span class="badge badge-purple">'+esc(item.tab)+'</span><span style="color:var(--text-dim);font-size:12px">'+esc(item.timestamp)+'</span></div><div style="font-family:var(--font-mono);font-size:12px;color:var(--text-main);word-break:break-all">'+esc(item.query)+'</div>'+(item.details?'<div style="color:var(--text-muted);font-size:12px">'+esc(item.details)+'</div>':'')+'<div style="display:flex;justify-content:flex-end;gap:6px;margin-top:4px"><button class="btn btn-secondary btn-sm" data-copy-text="'+attr(item.query)+'" data-copy-label="Copied">Copy</button></div></div>';
+  }).join('');
+}
+
+function loadProfile(){ try{ var r=localStorage.getItem(SK.PROFILE); return r?JSON.parse(r):{name:'',email:'',handle:'',avatar:''}; }catch(e){ return {name:'',email:'',handle:'',avatar:''}; } }
+function saveProfile(p){ localStorage.setItem(SK.PROFILE,JSON.stringify(p)); }
+function renderAvatar(){
+  var DEFAULT_AVATAR = 'https://i.pinimg.com/736x/ad/90/8a/ad908aa4dd8154bfb93bbd30b216b460.jpg';
+  var p = loadProfile();
+  var img = $('userAvatarImg'); var initEl = $('userAvatarInitials');
+  var src = p.avatar || DEFAULT_AVATAR;
+  if(img){ img.src = src; img.style.display = 'block'; }
+  if(initEl) initEl.style.display = 'none';
+  var prev = $('profileAvatarPreview');
+  if(prev){ prev.innerHTML = '<img src="'+esc(src)+'" style="width:100%;height:100%;object-fit:cover">'; }
+}
+
+var COMMUNITY_PLATFORMS = [
+  {name:'GitHub',url:'https://github.com',icon:'🐙'},
+  {name:'Twitter/X',url:'https://x.com',icon:'🐦'},
+  {name:'Discord',url:'https://discord.com',icon:'💬'},
+  {name:'Reddit',url:'https://reddit.com/r/bugbounty',icon:'🤖'},
+  {name:'HackerOne',url:'https://hackerone.com',icon:'🏆'}
+];
+function renderCommunityLinks(){
+  var c = $('communityLinksHeader'); if(!c) return;
+  c.innerHTML = COMMUNITY_PLATFORMS.map(function(p){
+    return '<a href="'+esc(p.url)+'" target="_blank" rel="noopener noreferrer" title="'+esc(p.name)+'">'+p.icon+'</a>';
+  }).join('');
+}
+
+function renderDonations(){
+  var c = $('donationLinks'); if(!c) return;
+  c.innerHTML = '<div style="display:flex;flex-direction:column;gap:8px"><a href="https://www.paypal.com/donate" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="justify-content:flex-start">💳 PayPal Donation</a><div style="display:flex;align-items:center;gap:8px;background:var(--bg-input);padding:10px 12px;border-radius:var(--radius-md);border:1px solid var(--border)"><span style="font-size:16px">₿</span><code style="font-family:var(--font-mono);font-size:12px;color:var(--accent-cyan);word-break:break-all">bc1qlinuxploiterxxxxxxxxxxxxxxxxxxxxxx</code><button class="btn btn-secondary btn-sm" data-copy-text="bc1qlinuxploiterxxxxxxxxxxxxxxxxxxxxxx" data-copy-label="Bitcoin address copied!">Copy</button></div></div>';
+}
+
+var RECON_TOOLS = [
+  {name:'Subfinder',desc:'Passive subdomain enumeration (ProjectDiscovery)',action:'subfinder'},
+  {name:'Amass',desc:'OWASP Amass - In-depth DNS enumeration & ASN',action:'amass'},
+  {name:'Assetfinder',desc:'Find domains/subdomains from multiple sources',action:'assetfinder'},
+  {name:'ShuffleDNS',desc:'DNS bruteforce with wildcard handling',action:'shuffledns'},
+  {name:'PureDNS',desc:'DNS brute-force + mass resolution',action:'puredns'},
+  {name:'CRT.sh',desc:'Certificate Transparency log search',action:'crtsh'},
+  {name:'HTTPX',desc:'Multi-purpose HTTP toolkit for live hosts',action:'httpx'},
+  {name:'DNSX',desc:'DNS toolkit for probing and enumeration',action:'dnsx'},
+  {name:'Naabu',desc:'Fast port scanner (ProjectDiscovery)',action:'naabu'},
+  {name:'Nmap',desc:'Network exploration and security auditing',action:'nmap'},
+  {name:'Masscan',desc:'Fastest internet-scale port scanner',action:'masscan'},
+  {name:'FFUF',desc:'Fast web fuzzer for directories and parameters',action:'ffuf'},
+  {name:'Feroxbuster',desc:'Recursive content discovery (Rust)',action:'feroxbuster'},
+  {name:'Dirsearch',desc:'Web path scanner with extensive wordlists',action:'dirsearch'},
+  {name:'Katana',desc:'Next-gen crawling framework with JS parsing',action:'katana'},
+  {name:'Gospider',desc:'Fast web spider for security testing',action:'gospider'},
+  {name:'Gau',desc:'Get All URLs from archives and sources',action:'gau'},
+  {name:'Waybackurls',desc:'Fetch URLs from Wayback Machine',action:'waybackurls'},
+  {name:'Alterx',desc:'Subdomain wordlist generator (DSL based)',action:'alterx'},
+  {name:'Nuclei',desc:'Template-based vulnerability scanner',action:'nuclei'},
+  {name:'Dalfox',desc:'XSS scanner with DOM analysis',action:'dalfox'},
+  {name:'Arjun',desc:'HTTP parameter discovery',action:'arjun'},
+  {name:'TruffleHog',desc:'Secret scanning in Git repos',action:'trufflehog'},
+  {name:'Gitleaks',desc:'Git secret leak detection',action:'gitleaks'}
+];
+var OSINT_TOOLS = [
+  {name:'theHarvester',desc:'Email, subdomain & host OSINT from public sources',action:'theharvester'},
+  {name:'Hunter.io',desc:'Find professional email addresses',action:'hunter'},
+  {name:'Have I Been Pwned',desc:'Check if emails/accounts have been breached',action:'haveibeenpwned'},
+  {name:'Sherlock',desc:'Hunt down social media accounts by username',action:'sherlock'},
+  {name:'Maigret',desc:'Collect dossier on a person by username (3000+ sites)',action:'maigret'},
+  {name:'Blackbird',desc:'OSINT tool for searching by username/email',action:'blackbird'},
+  {name:'SpiderFoot',desc:'Automated multi-source OSINT & threat intel',action:'spiderfoot'},
+  {name:'URLScan.io',desc:'Analyze websites and their infrastructure',action:'urlscan'},
+  {name:'VirusTotal',desc:'Analyze suspicious files and URLs',action:'virustotal'},
+  {name:'Intelligence X',desc:'Search engine for leaked data and OSINT',action:'intelx'},
+  {name:'GreyNoise',desc:'Check if IP is a known scanner or threat',action:'greynoise'},
+  {name:'Shodan',desc:'Internet-connected device search',action:'shodan'},
+  {name:'Censys',desc:'Search hosts, services, and TLS certificates',action:'censys'},
+  {name:'Google Dorking',desc:'Google Hacking Database (GHDB) queries',action:'ghdb'},
+  {name:'Pastebin Search',desc:'Search Pastebin for leaked data',action:'pastebin'},
+  {name:'NerdyData',desc:'Search the source code of websites',action:'nerdydata'},
+  {name:'IPInfo.io',desc:'IP geolocation and ASN details',action:'geoip'},
+  {name:'AbuseIPDB',desc:'Check IP reputation and abuse reports',action:'abuseipdb'}
+];
+function renderToolCards(tools,containerId){
+  var c = $(containerId); if(!c) return;
+  c.innerHTML = tools.map(function(t){return '<div class="tool-card"><div><div class="tool-name">'+esc(t.name)+'</div><div class="tool-desc">'+esc(t.desc)+'</div></div><button class="btn btn-outline-accent btn-sm" data-tool-run="'+esc(t.action)+'">Run</button></div>';}).join('');
+}
+function initTools(){
+  renderToolCards(RECON_TOOLS,'reconToolsGrid');
+  renderToolCards(OSINT_TOOLS,'osintToolsGrid');
+  document.querySelectorAll('[data-tool-run]').forEach(function(btn){
+    btn.addEventListener('click',function(){ runTool(btn.getAttribute('data-tool-run')); });
+  });
+}
+function runTool(tool){
+  recordToolUsage(tool);
+  var urlTools = {
+    crtsh:'https://crt.sh/', shodan:'https://www.shodan.io/', whois:'https://who.is/',
+    geoip:'https://ipinfo.io/', cache:'https://webcache.googleusercontent.com/',
+    reverseip:'https://viewdns.info/reverseip/', censys:'https://search.censys.io/',
+    urlscan:'https://urlscan.io/', virustotal:'https://www.virustotal.com/',
+    intelx:'https://intelx.io/', greynoise:'https://www.greynoise.io/',
+    hunter:'https://hunter.io/', haveibeenpwned:'https://haveibeenpwned.com/',
+    pastebin:'https://pastebin.com/', nerdydata:'https://www.nerdydata.com/',
+    socialsearcher:'https://www.social-searcher.com/', spiderfoot:'https://www.spiderfoot.net/',
+    ghdb:'https://www.exploit-db.com/google-hacking-database', abuseipdb:'https://www.abuseipdb.com/'
+  };
+  if(urlTools[tool]){
+    window.open(urlTools[tool],'_blank','noopener');
+    showToast('Opened '+tool+' in new tab','success');
+    addHistoryItem('Tool',tool,'Opened URL');
+    return;
+  }
+
+  var cmdMap = {
+    subfinder:'subfinder -d TARGET -all -silent -o subs.txt',
+    amass:'amass enum -passive -d TARGET -o amass.txt',
+    assetfinder:'assetfinder --subs-only TARGET | tee assetfinder.txt',
+    shuffledns:'shuffledns -d TARGET -w wordlist.txt -r resolvers.txt -o discovered.txt',
+    puredns:'puredns bruteforce wordlist.txt TARGET -r resolvers.txt',
+    httpx:'httpx -l subs.txt -title -tech-detect -status-code -o live.txt',
+    dnsx:'dnsx -l subs.txt -resp -a -cname -silent',
+    naabu:'naabu -host TARGET -top-ports 1000 -silent -o ports.txt',
+    nmap:'nmap -sV -sC -p- TARGET -oA nmap_scan',
+    masscan:'masscan -p1-65535 --rate=10000 TARGET',
+    ffuf:'ffuf -u https://TARGET/FUZZ -w wordlist.txt -mc 200,301,302,403',
+    feroxbuster:'feroxbuster -u https://TARGET -t 50 -x php,html,json',
+    dirsearch:'dirsearch -u https://TARGET -e php,asp,aspx,json,xml',
+    katana:'katana -u https://TARGET -jc -d 3 -o katana.txt',
+    gospider:'gospider -s https://TARGET -d 3 -o output',
+    gau:'gau TARGET --threads 5 | uro | tee gau_urls.txt',
+    waybackurls:'waybackurls TARGET | uro | tee wayback.txt',
+    alterx:'echo "api" | alterx -p "{{word}}-{{env}}" -env "dev,staging,prod"',
+    nuclei:'nuclei -l live_urls.txt -t cves/ -t exposures/ -t takeovers/',
+    dalfox:'dalfox file urls.txt --output dalfox_results.txt --deep-domxss',
+    arjun:'arjun -u https://TARGET/api/endpoint -m GET,POST',
+    trufflehog:'trufflehog github --org=ORG --token=$GITHUB_TOKEN --only-verified --json',
+    gitleaks:'gitleaks detect --source=. --report-path=gitleaks_report.json',
+    theharvester:'theHarvester -d TARGET -b all',
+    sherlock:'sherlock USERNAME',
+    maigret:'maigret USERNAME',
+    blackbird:'blackbird -u USERNAME',
+    spiderfoot:'spiderfoot -s TARGET -q -o spiderfoot_results.json'
+  };
+  if(cmdMap[tool]){
+    copyToClipboard(cmdMap[tool],'Command template disalin! Paste di terminal.');
+    addHistoryItem('Tool',tool,'Command template copied');
+    return;
+  }
+  showToast('Tool "'+tool+'" aktif.','info');
+  addHistoryItem('Tool',tool,'Activated');
+}
+
+function loadBountyTracker(){ try{ var r=localStorage.getItem(SK.BOUNTY); return r?JSON.parse(r):[]; }catch(e){ return []; } }
+function saveBountyTracker(e){ localStorage.setItem(SK.BOUNTY,JSON.stringify(e)); }
+function renderBountyTable(){
+  var entries = loadBountyTracker();
+  var tbody = $('bountyTrackerBody'); if(!tbody) return;
+  if(!entries.length){ tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:20px">Belum ada entries.</td></tr>'; return; }
+  tbody.innerHTML = entries.map(function(e,i){
+    var sevClass = e.severity==='Critical'?'red':e.severity==='High'?'amber':'cyan';
+    return '<tr><td>'+esc(e.program||'-')+'</td><td>'+esc(e.vulnerability||'-')+'</td><td><span class="badge badge-'+sevClass+'">'+esc(e.severity||'-')+'</span></td><td>'+esc(e.status||'-')+'</td><td>'+esc(e.reward||'-')+'</td><td>'+esc(e.date||'-')+'</td><td><button class="btn btn-danger btn-sm" data-bounty-delete="'+i+'">Delete</button></td></tr>';
+  }).join('');
+  tbody.querySelectorAll('[data-bounty-delete]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var idx = parseInt(btn.getAttribute('data-bounty-delete'),10);
+      var arr = loadBountyTracker(); arr.splice(idx,1); saveBountyTracker(arr); renderBountyTable(); showToast('Entry deleted','info');
+    });
+  });
+}
+function addBountyEntry(){
+  var program = prompt('Program name:'); if(!program) return;
+  var vulnerability = prompt('Vulnerability title:')||'';
+  var severity = prompt('Severity (Critical/High/Medium/Low):')||'Medium';
+  var status = prompt('Status (New/Triaged/Resolved/Duplicate):')||'New';
+  var reward = prompt('Reward (contoh: $500):')||'';
+  var date = new Date().toISOString().slice(0,10);
+  var arr = loadBountyTracker(); arr.unshift({program:program,vulnerability:vulnerability,severity:severity,status:status,reward:reward,date:date});
+  saveBountyTracker(arr); renderBountyTable(); showToast('Bounty entry added','success');
+}
+
+function generateReport(){
+  var program = nt($('reportProgram').value)||'N/A';
+  var title = nt($('reportTitle').value)||'Untitled Vulnerability';
+  var severity = $('reportSeverity').value;
+  var description = nt($('reportDescription').value)||'N/A';
+  var steps = nt($('reportSteps').value)||'N/A';
+  var impact = nt($('reportImpact').value)||'N/A';
+  var remediation = nt($('reportRemediation').value)||'N/A';
+  var md = '# '+title+'\n\n**Program:** '+program+'\n**Severity:** '+severity+'\n**Date:** '+new Date().toISOString().slice(0,10)+'\n\n## Description\n'+description+'\n\n## Steps to Reproduce\n'+steps+'\n\n## Impact\n'+impact+'\n\n## Remediation\n'+remediation+'\n';
+  var out = $('reportOutput'); if(out) out.textContent = md;
+  return md;
+}
+
+var ERROR_PATTERNS = [
+  {pattern:/cors/i,title:'CORS Error',advice:'Browser blocked cross-origin request. Use a CORS proxy in Settings.',severity:'medium'},
+  {pattern:/failed to fetch|networkerror/i,title:'Network Fetch Failure',advice:'Check network connectivity or CORS policy.',severity:'medium'},
+  {pattern:/401|unauthorized/i,title:'Unauthorized',advice:'API key missing or invalid.',severity:'high'},
+  {pattern:/403|forbidden/i,title:'Forbidden',advice:'Access denied. Target may block your IP.',severity:'high'},
+  {pattern:/404|not found/i,title:'Not Found',advice:'Resource missing. Verify URL or path.',severity:'low'},
+  {pattern:/429|rate limit/i,title:'Rate Limited',advice:'Too many requests. Wait and retry.',severity:'medium'},
+  {pattern:/500|internal server error/i,title:'Server Error',advice:'Target server issue. Retry later.',severity:'medium'},
+  {pattern:/timeout|timed out/i,title:'Timeout',advice:'Request exceeded time limit.',severity:'medium'},
+  {pattern:/ssl|tls|certificate/i,title:'TLS/Certificate Error',advice:'Certificate mismatch or expired.',severity:'medium'},
+  {pattern:/dns|nxdomain|servfail/i,title:'DNS Error',advice:'Domain resolution failed.',severity:'high'}
+];
+async function analyzeError(){
+  var input = nt($('errorInput').value);
+  var output = $('errorOutput');
+  if(!input){ showToast('Paste error dulu','warning'); return; }
+  var matches = ERROR_PATTERNS.filter(function(p){return p.pattern.test(input)});
+  var result = matches.length ? matches.map(function(m){return '['+m.severity.toUpperCase()+'] '+m.title+'\n→ '+m.advice}).join('\n\n') : 'No known pattern matched. Application-specific error.';
+  output.textContent = result;
+  var keys = loadSavedKeys();
+  if(keys.geminiApiKey){
+    output.textContent = result+'\n\n[AI] Menghubungi Gemini...';
+    try{
+      var r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key='+encodeURIComponent(keys.geminiApiKey),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:'Analisis error berikut untuk bug bounty:\n\n'+input}]}]})});
+      var d = await r.json(); var t = d&&d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts&&d.candidates[0].content.parts[0]&&d.candidates[0].content.parts[0].text;
+      if(t) result += '\n\n=== AI Analysis (Gemini) ===\n'+t;
+    }catch(e){ result += '\n\n[AI] Gemini gagal: '+e.message; }
+  } else if(keys.groqApiKey){
+    output.textContent = result+'\n\n[AI] Menghubungi Groq...';
+    try{
+      var r2 = await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+keys.groqApiKey},body:JSON.stringify({model:'llama3-8b-8192',messages:[{role:'user',content:'Analisis error berikut untuk bug bounty:\n\n'+input}]})});
+      var d2 = await r2.json(); var t2 = d2&&d2.choices&&d2.choices[0]&&d2.choices[0].message&&d2.choices[0].message.content;
+      if(t2) result += '\n\n=== AI Analysis (Groq) ===\n'+t2;
+    }catch(e){ result += '\n\n[AI] Groq gagal: '+e.message; }
+  }
+  output.textContent = result;
+  addHistoryItem('Error Analyzer',input.substring(0,60),matches.length+' patterns');
+  showToast('Error analyzed','success');
+}
+
+var GUIDE_TOPICS = [
+  {title:'1. Dork Generator',tabId:'tab-dork',tabLabel:'Dork Generator',desc:'Menyusun query pencarian untuk menemukan halaman disclosure, program bounty, dan dokumen terkait.',steps:['Pilih mode, domain opsional, dan file type.','Klik chip platform, path, dan keyword untuk mengaktifkan atau menonaktifkannya.','Pilih Generate Dorks; gunakan Copy, Google, atau API pada tiap query.','Impor daftar .TXT/.CSV/.JSON atau ekspor query ke .TXT, .JSON, .CSV, dan .MD.']},
+  {title:'2. Google Custom Search',tabId:'tab-google',tabLabel:'Google API',desc:'Menjalankan query melalui Google Programmable Search Engine. Query dari Dork Generator dapat dikirim dengan tombol API pada hasil dork.',steps:['Atur Google API Key dan Search Engine ID (CX) di menu API Keys & Proxy.','Masukkan query, lalu pilih Search.','Salin semua URL atau ekspor hasil ke JSON.']},
+  {title:'3. security.txt Scanner',tabId:'tab-securitytxt',tabLabel:'security.txt Scanner',desc:'Memeriksa file disclosure security.txt pada banyak domain dan menampilkan kontak serta directive yang ditemukan.',steps:['Masukkan domain satu per baris atau impor daftar domain.','Atur concurrency, timeout, dan path yang akan diperiksa.','Pilih Start Batch Scan; gunakan Stop untuk membatalkan.','Filter hasil berdasarkan domain, status, atau path; buka konten, lalu ekspor CSV/JSON.']},
+  {title:'4. Shodan Search',tabId:'tab-shodan',tabLabel:'Shodan',desc:'Mencari host dan layanan internet berdasarkan query Shodan, termasuk port, hostname, organisasi, dan sertifikat.',steps:['Simpan Shodan API Key di pengaturan atau isi pada tab ini.','Masukkan query atau pilih salah satu preset, lalu jalankan Search Shodan.','Salin alamat IP atau ekspor hasil ke JSON/CSV.']},
+  {title:'5. Censys Search',tabId:'tab-censys',tabLabel:'Censys',desc:'Mencari host, nama virtual host, dan informasi sertifikat TLS menggunakan Censys Hosts API.',steps:['Masukkan Censys API ID dan API Secret di pengaturan atau pada tab.','Tulis query Censys atau pilih preset, lalu jalankan Search Censys.','Salin IP atau ekspor hasil ke JSON/CSV.']},
+  {title:'6. HackerOne Scope Fetcher',tabId:'tab-h1scope',tabLabel:'H1 Scope',desc:'Memuat aset in-scope dan out-of-scope dari handle program atau JSON scope yang ditempel.',steps:['Masukkan handle dan pilih Fetch Scope; Load Sample tersedia untuk mencoba tampilan.','Untuk data lokal, buka bagian paste JSON, tempel data, lalu pilih Parse Pasted JSON.','Salin domain in-scope, kirim domain ke scanner/command builder, atau ekspor CSV/Markdown.']},
+  {title:'7. Command Builder',tabId:'tab-commands',tabLabel:'Command Builder',desc:'Membuat perintah dan script shell untuk alur recon CLI seperti Subfinder, HTTPX, Katana, GAU, FFUF, dan DNSX.',steps:['Atur target, file input, direktori output, thread, wordlist, dan custom header.','Salin pipeline yang diperlukan atau semua pipeline.','Download script .sh, tinjau isinya, lalu jalankan sendiri di lingkungan yang sudah memiliki tool terkait.']},
+  {title:'8. Recon Tools',tabId:'tab-recon',tabLabel:'Recon Tools',desc:'Kumpulan 14 utilitas recon cepat. Klik Run untuk menyalin command template atau membuka URL tool terkait.',steps:['Klik Run pada tool yang diinginkan.','Command template otomatis tersalin ke clipboard — paste di terminal.','URL tool akan terbuka di tab baru untuk whois, crt.sh, dan sejenisnya.','Penggunaan tool tercatat otomatis di dashboard.']},
+  {title:'9. OSINT Tools',tabId:'tab-osint',tabLabel:'OSINT Tools',desc:'Kumpulan 5 utilitas open-source intelligence. Klik Run untuk membuka tool atau menyalin command.',steps:['Klik Run pada tool yang diinginkan.','URL akan terbuka atau command akan disalin otomatis.','Gunakan hasilnya untuk memperkaya data recon target.']},
+  {title:'10. Bounty Tracker',tabId:'tab-bounty',tabLabel:'Bounty Tracker',desc:'Catat vulnerability yang kamu submit ke program bug bounty, beserta status dan reward yang diterima.',steps:['Klik + Add Entry untuk menambah catatan baru.','Isi program, judul vulnerability, severity, status, dan reward.','Gunakan tombol Delete untuk menghapus entri yang salah.','Data tersimpan permanen di localStorage dan ikut terekspor via Report JSON/CSV.']},
+  {title:'11. Report Generator',tabId:'tab-report',tabLabel:'Report Generator',desc:'Membuat laporan vulnerability terstruktur dalam format Markdown dan JSON, siap dikirim ke program bug bounty.',steps:['Isi program, judul, severity, dan deskripsi vulnerability.','Lengkapi langkah reproduksi, impact, dan remediation.','Klik Generate untuk melihat preview di output box.','Copy atau download sebagai .md/.json.']},
+  {title:'12. Error Analyzer',tabId:'tab-error',tabLabel:'Error Analyzer',desc:'Menganalisis pesan error atau stack trace menggunakan pattern database, dengan AI fallback jika API key Gemini atau Groq tersedia.',steps:['Paste error message atau stack trace ke textarea.','Klik Analyze Error.','Pattern DB akan mencocokkan 10 kategori error umum (CORS, 401, 403, timeout, dll).','Jika Gemini/Groq API key tersedia, AI akan memberi analisis tambahan.']},
+  {title:'13. Riwayat, laporan, dan tampilan',tabId:'tab-dashboard',tabLabel:'Dashboard',desc:'Fitur global yang tersedia dari header aplikasi.',steps:['History menampilkan aksi terbaru; query dapat disalin dan riwayat bisa dibersihkan.','Report JSON/CSV di header mengekspor hasil dari berbagai tab beserta riwayat; API key tidak disertakan.','API Keys & Proxy mengelola kredensial, CORS proxy, impor/ekspor pengaturan, dan reset default.','Theme mengganti tema terang/gelap. Language selector mengganti bahasa antarmuka.']}
+];
+
+function renderGuide(){
+  var grid = $('guideGrid'); if(!grid) return;
+  grid.innerHTML = GUIDE_TOPICS.map(function(t){
+    return '<article class="guide-card">'+
+      '<h3>'+esc(t.title)+'</h3>'+
+      '<p>'+esc(t.desc)+'</p>'+
+      '<ol>'+t.steps.map(function(s){return '<li>'+esc(s)+'</li>'}).join('')+'</ol>'+
+      '<button class="btn btn-secondary btn-sm" data-guide-tab="'+t.tabId+'">Buka '+esc(t.tabLabel)+'</button>'+
+    '</article>';
+  }).join('');
+  grid.querySelectorAll('[data-guide-tab]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var tabId = btn.getAttribute('data-guide-tab');
+      var tabBtn = document.querySelector('.tab-btn[data-tab="'+tabId+'"]');
+      if(tabBtn) tabBtn.click();
+    });
+  });
+}
+function searchGuide(query){
+  var q = query.trim().toLowerCase();
+  document.querySelectorAll('#guideGrid .guide-card').forEach(function(card){
+    card.style.display = card.textContent.toLowerCase().indexOf(q) > -1 ? '' : 'none';
+  });
+}
+
+function renderDashboard(){
+  var stats = getStats();
+  var history = getHistory();
+  var mc = $('metricCards');
+  if(mc){
+    var totalScans = stats.scans||0, totalFindings = stats.findings||0;
+    var totalDorks = stats.dorks || history.filter(function(h){return h.tab==='Dork Gen'}).length;
+    var toolsUsed = Object.keys(stats.tools||{}).length;
+    mc.innerHTML = '<div class="metric-card"><div class="metric-value">'+totalScans+'</div><div class="metric-label">Total Scans</div></div><div class="metric-card"><div class="metric-value">'+totalFindings+'</div><div class="metric-label">Findings</div></div><div class="metric-card"><div class="metric-value">'+totalDorks+'</div><div class="metric-label">Dorks</div></div><div class="metric-card"><div class="metric-value">'+toolsUsed+'</div><div class="metric-label">Tools Used</div></div>';
+  }
+  var ts = $('todayStats');
+  if(ts){
+    var today = new Date().toISOString().slice(0,10);
+    var td = (stats.daily&&stats.daily[today])||{scans:0,findings:0};
+    var weekAgo = new Date(Date.now()-7*864e5).toISOString().slice(0,10);
+    var wS=0,wF=0;
+    Object.keys(stats.daily||{}).forEach(function(d){ if(d>=weekAgo){ wS+=(stats.daily[d].scans||0); wF+=(stats.daily[d].findings||0); } });
+    ts.innerHTML = '<div class="metric-card"><div class="metric-value">'+td.scans+'</div><div class="metric-label">Scans Today</div></div><div class="metric-card"><div class="metric-value">'+td.findings+'</div><div class="metric-label">Findings Today</div></div><div class="metric-card"><div class="metric-value">'+wS+'</div><div class="metric-label">Scans (7d)</div></div><div class="metric-card"><div class="metric-value">'+wF+'</div><div class="metric-label">Findings (7d)</div></div>';
+  }
+  var ct = $('channelTableBody');
+  if(ct){
+    var chs = Object.keys(stats.channels||{});
+    if(!chs.length) ct.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:20px">Belum ada data.</td></tr>';
+    else ct.innerHTML = chs.map(function(name){ var d = stats.channels[name]; var rate = d.scans?Math.round(d.findings/d.scans*100):0; return '<tr><td>'+esc(name)+'</td><td>'+d.scans+'</td><td>'+d.findings+'</td><td>'+rate+'%</td></tr>'; }).join('');
+  }
+  if(typeof Chart !== 'undefined'){
+    var labels=[],scanData=[],findingData=[];
+    for(var i=6;i>=0;i--){
+      var d2 = new Date(Date.now()-i*864e5);
+      var key = d2.toISOString().slice(0,10);
+      labels.push(d2.toLocaleDateString(undefined,{weekday:'short'}));
+      var dayData = (stats.daily&&stats.daily[key])||{scans:0,findings:0};
+      scanData.push(dayData.scans); findingData.push(dayData.findings);
+    }
+    if(weeklyChartInstance) weeklyChartInstance.destroy();
+    var wEl = $('weeklyChart');
+    if(wEl) weeklyChartInstance = new Chart(wEl,{type:'line',data:{labels:labels,datasets:[{label:'Scans',data:scanData,borderColor:'#a020f0',backgroundColor:'rgba(160,32,240,.15)',tension:.3,fill:true},{label:'Findings',data:findingData,borderColor:'#00e5ff',backgroundColor:'rgba(0,229,255,.1)',tension:.3,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9595ad',font:{size:12}}}},scales:{x:{ticks:{color:'#60607a'}},y:{ticks:{color:'#60607a'},beginAtZero:true}}}});
+    var toolEntries = Object.keys(stats.tools||{}).map(function(k){return [k,stats.tools[k]]});
+    if(featuresChartInstance) featuresChartInstance.destroy();
+    var fEl = $('featuresChart');
+    if(fEl) featuresChartInstance = new Chart(fEl,{type:'bar',data:{labels:toolEntries.length?toolEntries.map(function(t){return t[0]}):['No data'],datasets:[{label:'Uses',data:toolEntries.length?toolEntries.map(function(t){return t[1]}):[0],backgroundColor:'rgba(160,32,240,.6)',borderColor:'#a020f0',borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#60607a',font:{size:11}}},y:{ticks:{color:'#60607a'},beginAtZero:true}}}});
+    var dorkCount = stats.dorks||0, scanCount = stats.scans||0;
+    var otherCount = Math.max(0,history.length-dorkCount-scanCount);
+    if(donutChartInstance) donutChartInstance.destroy();
+    var dEl = $('donutChart');
+    if(dEl) donutChartInstance = new Chart(dEl,{type:'doughnut',data:{labels:['Dorks','Scans','Other'],datasets:[{data:[dorkCount,scanCount,otherCount],backgroundColor:['#a020f0','#00e5ff','#10b981'],borderColor:'#12121a',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#9595ad',font:{size:12}}}}}});
+  }
+}
+
+function saveFormState(){
+  var state = {};
+  ['dorkMode','dorkTargetDomain','dorkFiletype','googleQuery','securityTxtDomains','scanConcurrency','scanTimeout','scanPathChoice','shodanQuery','censysQuery','h1Handle','h1CustomJson','cmdTarget','cmdInputFile','cmdOutputDir','cmdThreads','cmdWordlist','cmdHeader','reportProgram','reportTitle','reportSeverity','reportDescription','reportSteps','reportImpact','reportRemediation'].forEach(function(id){ var el=$(id); if(el) state[id]=el.value; });
+  try{ localStorage.setItem(SK.FORM_STATE,JSON.stringify(state)); }catch(e){}
+}
+function restoreFormState(){
+  try{
+    var raw = localStorage.getItem(SK.FORM_STATE); if(!raw) return;
+    var state = JSON.parse(raw);
+    Object.keys(state).forEach(function(id){ var el=$(id); if(el) el.value=state[id]; });
+    var cEl=$('scanConcurrency'), tEl=$('scanTimeout');
+    if(cEl) cEl.dispatchEvent(new Event('input'));
+    if(tEl) tEl.dispatchEvent(new Event('input'));
+  }catch(e){}
+}
+
+function getActiveChips(cid){ return Array.prototype.map.call(document.querySelectorAll('#'+cid+' .chip.active'),function(c){return c.getAttribute('data-val')}); }
+function generateDorks(){
+  var mode = $('dorkMode').value;
+  var targetDomain = nt($('dorkTargetDomain').value);
+  var filetype = nt($('dorkFiletype').value);
+  var platforms = getActiveChips('dorkPlatformChips');
+  var paths = getActiveChips('dorkPathChips');
+  var keywords = getActiveChips('dorkKeywordChips');
+  var ftClause = filetype ? ' filetype:'+filetype : '';
+  var dorks = [];
+  var scopeSites = targetDomain ? ['site:'+targetDomain] : platforms.map(function(p){return 'site:'+p});
+  if(mode==='combo'){ scopeSites.forEach(function(s){paths.forEach(function(p){keywords.forEach(function(k){dorks.push(s+' inurl:'+p+' intext:'+k+ftClause)})})}) }
+  else if(mode==='site_inurl'){ scopeSites.forEach(function(s){paths.forEach(function(p){dorks.push(s+' inurl:'+p+ftClause)})}) }
+  else if(mode==='site_intext'){ scopeSites.forEach(function(s){keywords.forEach(function(k){dorks.push(s+' intext:'+k+ftClause)})}) }
+  else if(mode==='site_filetype'){ var ft=filetype||'pdf'; scopeSites.forEach(function(s){keywords.forEach(function(k){dorks.push(s+' filetype:'+ft+' '+k)})}) }
+  else if(mode==='intitle'){ keywords.forEach(function(k){var raw=k.replace(/"/g,''); scopeSites.forEach(function(s){dorks.push(s+' intitle:"'+raw+'"'+ftClause)})}) }
+  else if(mode==='inurl'){ paths.forEach(function(p){keywords.forEach(function(k){dorks.push('inurl:'+p+' intext:'+k+ftClause)})}) }
+  else if(mode==='intext'){ keywords.forEach(function(k){dorks.push('intext:'+k+' inurl:security'+ftClause)}) }
+  else if(mode==='programs_hunter'){
+    ['inurl:"/security" intext:"bounty" -site:hackerone.com','inurl:"/.well-known/security.txt" intext:"Contact:"','inurl:"responsible-disclosure" intext:"hall of fame"','inurl:"security-policy" intext:"vulnerability" "reward"','intext:"submit a vulnerability" "security"','site:*.gov inurl:"vulnerability-disclosure-policy"','site:*.edu inurl:"security.txt"','inurl:"/bugbounty" "scope" "reward"'].forEach(function(hd){dorks.push(hd+ftClause)});
+  }
+  var uniq = Array.from(new Set(dorks)).filter(Boolean);
+  generatedDorksCache = uniq;
+  recordStat('dorks',uniq.length);
+  $('dorkResultCount').textContent = uniq.length;
+  $('dorkCountBadge').textContent = uniq.length+' Dorks Ready';
+  var c = $('dorkResultsList');
+  if(!uniq.length){ c.innerHTML = '<div style="color:var(--text-dim);text-align:center;padding:30px">Tidak ada dork yang bisa dibuat.</div>'; return; }
+  c.innerHTML = uniq.map(function(dork,idx){
+    return '<div class="dork-item"><span class="badge badge-purple" style="font-size:10px">#'+(idx+1)+'</span><span class="dork-text">'+esc(dork)+'</span><div class="dork-actions"><button class="btn btn-secondary btn-sm" data-copy-text="'+attr(dork)+'" data-copy-label="Dork copied!">Copy</button><a href="https://www.google.com/search?q='+encodeURIComponent(dork)+'" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Google ↗</a><button class="btn btn-secondary btn-sm" data-google-dork="'+attr(dork)+'">API ➜</button></div></div>';
+  }).join('');
+  addHistoryItem('Dork Gen',uniq.length+' dorks ('+mode+')',targetDomain||'Multi-platform');
+  showToast('Generated '+uniq.length+' dorks','success');
+}
+
+async function importDorksFile(ev){
+  var file = ev.target.files && ev.target.files[0]; if(!file) return;
+  try{
+    var text = await file.text();
+    var items = text.split(/\r?\n|,/).map(function(s){return s.trim()}).filter(Boolean);
+    var filtered = Array.from(new Set(items.filter(function(i){return i.length>2 && i.charAt(0)!=='#'})));
+    if(!filtered.length) throw new Error('No valid dorks');
+    generatedDorksCache = filtered;
+    $('dorkResultCount').textContent = filtered.length;
+    $('dorkCountBadge').textContent = filtered.length+' Dorks Ready';
+    $('dorkResultsList').innerHTML = filtered.map(function(dork,idx){return '<div class="dork-item"><span class="badge badge-purple" style="font-size:10px">#'+(idx+1)+'</span><span class="dork-text">'+esc(dork)+'</span><div class="dork-actions"><button class="btn btn-secondary btn-sm" data-copy-text="'+attr(dork)+'">Copy</button><button class="btn btn-secondary btn-sm" data-google-dork="'+attr(dork)+'">API ➜</button></div></div>'}).join('');
+    showToast('Imported '+filtered.length+' dorks','success');
+  }catch(e){ showToast('Failed to import dorks','error'); }
+  ev.target.value = '';
+}
+function exportDorks(format){
+  if(!generatedDorksCache.length){ showToast('No dorks to export','warning'); return; }
+  if(format==='txt') downloadFile(generatedDorksCache.join('\n'),'linuxploiter_dorks.txt','text/plain');
+  else if(format==='json'){ var data = generatedDorksCache.map(function(d,i){return {id:i+1,dork:d,googleUrl:'https://www.google.com/search?q='+encodeURIComponent(d)}}); downloadFile(JSON.stringify(data,null,2),'linuxploiter_dorks.json','application/json'); }
+  else if(format==='csv'){ var rows=['ID,Dork,GoogleURL']; generatedDorksCache.forEach(function(d,i){rows.push((i+1)+',"'+d.replace(/"/g,'""')+'","https://www.google.com/search?q='+encodeURIComponent(d)+'"')}); downloadFile(rows.join('\n'),'linuxploiter_dorks.csv','text/csv'); }
+  else if(format==='md'){ var md=['# LinuxPloiter Dorks','Generated: '+new Date().toISOString(),'','| # | Dork | Search |','|---|---|---|']; generatedDorksCache.forEach(function(d,i){md.push('| '+(i+1)+' | `'+d.replace(/\|/g,'\\|')+'` | [Search](https://www.google.com/search?q='+encodeURIComponent(d)+') |')}); downloadFile(md.join('\n'),'linuxploiter_dorks.md','text/markdown'); }
+}
+
+async function executeGoogleSearch(){
+  var apiKey = nt($('googleApiKey').value), cx = nt($('googleCx').value), query = nt($('googleQuery').value);
+  var statusEl = $('googleSearchStatus'), container = $('googleResultsList'), countEl = $('googleResultCount');
+  if(!apiKey||!cx){ showToast('Google API Key & CX wajib','error'); return; }
+  if(!query||query.length<3){ showToast('Query minimal 3 karakter','warning'); return; }
+  statusEl.style.display='block'; statusEl.textContent='Executing Google Custom Search...'; container.innerHTML='';
+  try{
+    var rawUrl = 'https://www.googleapis.com/customsearch/v1?key='+encodeURIComponent(apiKey)+'&cx='+encodeURIComponent(cx)+'&q='+encodeURIComponent(query);
+    var resp = await fetch(wrapWithCorsProxy(rawUrl));
+    var data = await resp.json();
+    if(data.error) throw new Error(data.error.message);
+    var items = data.items||[];
+    googleResultsCache = items; countEl.textContent = items.length; statusEl.style.display='none';
+    if(!items.length){ container.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:24px">Tidak ada hasil.</div>'; return; }
+    container.innerHTML = items.map(function(item){return '<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px"><a href="'+esc(item.link)+'" target="_blank" rel="noopener noreferrer" style="color:var(--accent-cyan);font-weight:600;text-decoration:none">'+esc(item.title)+'</a><div style="color:var(--text-muted);font-size:12px;font-family:var(--font-mono)">'+esc(item.formattedUrl||item.link)+'</div><div style="color:var(--text-main);font-size:13px">'+esc(item.snippet||'')+'</div></div>'}).join('');
+    recordStat('scans'); recordChannelStat('Google API',items.length>0);
+    addHistoryItem('Google API',query,items.length+' results');
+    showToast('Found '+items.length+' results','success');
+  }catch(err){
+    statusEl.style.display='block'; statusEl.className='alert alert-amber';
+    statusEl.innerHTML='<strong>Error:</strong> '+esc(err.message)+'<br><small>Jika CORS, set proxy di Settings.</small>';
+    showToast(err.message,'error');
+  }
+}
+
+function parseSecurityTxtDirectives(text){
+  var d = {contacts:[],policy:[],acknowledgments:[],hiring:[]};
+  if(!text) return d;
+  text.split('\n').forEach(function(line){
+    var t = line.trim(); if(!t||t.charAt(0)==='#') return;
+    var l = t.toLowerCase();
+    if(l.indexOf('contact:')===0) d.contacts.push(t.substring(8).trim());
+    else if(l.indexOf('policy:')===0) d.policy.push(t.substring(7).trim());
+    else if(l.indexOf('acknowledgments:')===0||l.indexOf('acknowledgements:')===0) d.acknowledgments.push(t.split(':')[1].trim());
+    else if(l.indexOf('hiring:')===0) d.hiring.push(t.substring(7).trim());
+  });
+  return d;
+}
+async function probeDomain(domain,timeoutMs,pathChoice,signal){
+  var clean = domain.trim().replace(/^https?:\/\//i,'').replace(/\/.*$/,'');
+  if(!clean) return null;
+  var paths = pathChoice==='both'?['/.well-known/security.txt','/security.txt']:pathChoice==='wellknown'?['/.well-known/security.txt']:['/security.txt'];
+  var start = performance.now();
+  for(var i=0;i<paths.length;i++){
+    var p = paths[i]; var url = 'https://'+clean+p; var finalUrl = wrapWithCorsProxy(url);
+    try{
+      var ctrl = new AbortController(); var tid = setTimeout(function(){ctrl.abort()},timeoutMs);
+      var ah = function(){ctrl.abort()}; signal.addEventListener('abort',ah,{once:true});
+      var resp = await fetch(finalUrl,{signal:ctrl.signal,mode:'cors'});
+      clearTimeout(tid); signal.removeEventListener('abort',ah);
+      var lat = Math.round(performance.now()-start);
+      if(resp.ok){
+        var body = await resp.text();
+        if(body && (body.toLowerCase().indexOf('contact:')>-1 || body.toLowerCase().indexOf('policy:')>-1 || body.indexOf('@')>-1)){
+          return {domain:clean,status:'Found',statusCode:resp.status,path:p,latency:lat,content:body,directives:parseSecurityTxtDirectives(body)};
+        }
+      }
+    }catch(err){
+      var lat2 = Math.round(performance.now()-start);
+      if(err.name==='AbortError') return {domain:clean,status:'Timeout',statusCode:null,path:p,latency:lat2,error:'Timed out'};
+      return {domain:clean,status:'CORS/Error',statusCode:null,path:p,latency:lat2,error:err.message};
+    }
+  }
+  return {domain:clean,status:'Not Found',statusCode:404,path:paths[0],latency:Math.round(performance.now()-start)};
+}
+async function startSecurityScan(){
+  var rawDomains = parseDomainList($('securityTxtDomains').value);
+  if(!rawDomains.length){ showToast('Paste minimal 1 domain valid','warning'); return; }
+  $('btnStartSecurityScan').disabled = true;
+  $('btnStopSecurityScan').disabled = false;
+  activeScanAbortController = new AbortController();
+  var concurrency = parseInt($('scanConcurrency').value,10);
+  var timeoutMs = parseInt($('scanTimeout').value,10);
+  var pathChoice = $('scanPathChoice').value;
+  $('scanProgressWrapper').style.display = 'flex';
+  scannedResultsList = [];
+  var tbody = $('securityResultsBody'); tbody.innerHTML = '';
+  var total = rawDomains.length, processed=0, found=0, notFound=0, errors=0;
+  function updateStats(){
+    $('scanStatTotal').textContent = 'Total: '+total;
+    $('scanStatFound').textContent = 'Found: '+found;
+    $('scanStatNotFound').textContent = 'Not Found: '+notFound;
+    $('scanStatError').textContent = 'Errors: '+errors;
+    var pct = Math.round(processed/total*100);
+    $('scanProgressFill').style.width = pct+'%';
+    $('scanProgressPercent').textContent = pct+'% ('+processed+'/'+total+')';
+  }
+  updateStats();
+  var di = 0;
+  async function worker(){
+    while(di<rawDomains.length && !activeScanAbortController.signal.aborted){
+      var cur = rawDomains[di++];
+      var res = await probeDomain(cur,timeoutMs,pathChoice,activeScanAbortController.signal);
+      if(res){
+        processed++; scannedResultsList.push(res);
+        if(res.status==='Found') found++; else if(res.status==='Not Found') notFound++; else errors++;
+        updateStats();
+        var tbody2 = $('securityResultsBody');
+        if(tbody2.querySelector('td[colspan]')) tbody2.innerHTML = '';
+        var tr = document.createElement('tr');
+        var sb = res.status==='Found'?'<span class="badge badge-green">✓ Found</span>':res.status==='Not Found'?'<span class="badge badge-red">✗ 404</span>':res.status==='Timeout'?'<span class="badge badge-amber">⏱ Timeout</span>':'<span class="badge badge-amber">⚠ CORS</span>';
+        var sum = '-';
+        if(res.directives){ var parts=[]; if(res.directives.contacts.length)parts.push('📧 '+res.directives.contacts.slice(0,2).join(', ')); if(res.directives.policy.length)parts.push('📜 Policy'); sum = parts.join(' | ')||'RFC Valid'; }
+        tr.innerHTML = '<td style="font-weight:600">'+esc(res.domain)+'</td><td>'+sb+'</td><td style="color:var(--text-muted)">'+esc(res.path||'')+'</td><td>'+res.latency+' ms</td><td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(sum)+'">'+esc(sum)+'</td><td>'+(res.content?'<button class="btn btn-secondary btn-sm" data-security-domain="'+attr(res.domain)+'">View</button>':'-')+'</td>';
+        tbody2.appendChild(tr);
+      }
+    }
+  }
+  var workers = [];
+  for(var w=0;w<Math.min(concurrency,rawDomains.length);w++) workers.push(worker());
+  await Promise.all(workers);
+  $('btnStartSecurityScan').disabled = false;
+  $('btnStopSecurityScan').disabled = true;
+  activeScanAbortController = null;
+  recordStat('scans',total); recordStat('findings',found);
+  recordChannelStat('security.txt',found>0);
+  addHistoryItem('security.txt Scan',total+' domains','Found: '+found+', Errors: '+errors);
+  showToast('Scan complete. Found: '+found, found>0?'success':'info');
+}
+
+async function executeShodan(){
+  var apiKey = nt($('shodanApiKey').value), query = nt($('shodanQuery').value);
+  var container = $('shodanResultsList'), badge = $('shodanCountBadge');
+  if(!apiKey){ showToast('Shodan API Key wajib','error'); return; }
+  if(!query||query.length<3){ showToast('Query min 3 karakter','warning'); return; }
+  container.innerHTML = '<div class="alert alert-info">Querying Shodan...</div>';
+  try{
+    var rawUrl = 'https://api.shodan.io/shodan/host/search?key='+encodeURIComponent(apiKey)+'&query='+encodeURIComponent(query);
+    var resp = await fetch(wrapWithCorsProxy(rawUrl));
+    var data = await resp.json();
+    if(data.error) throw new Error(data.error);
+    var matches = data.matches||[];
+    shodanResultsCache = matches;
+    badge.textContent = matches.length+' / '+(data.total||matches.length)+' Hosts';
+    if(!matches.length){ container.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:24px">Tidak ada hosts.</div>'; return; }
+    container.innerHTML = matches.map(function(host){
+      var ip = host.ip_str, org = host.org||host.isp||'Unknown';
+      var hostnames = (host.hostnames||[]).join(', ')||'-';
+      var loc = [host.location&&host.location.city, host.location&&host.location.country_name].filter(Boolean).join(', ')||'Global';
+      return '<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--font-mono);font-weight:700;color:var(--accent-cyan)">'+esc(ip)+'</span><span class="badge badge-purple">Port: '+host.port+'</span><span class="badge badge-cyan">'+esc(loc)+'</span></div><div style="color:var(--text-main);font-size:13px;margin-top:4px"><strong>Org:</strong> '+esc(org)+' | <strong>Hostnames:</strong> '+esc(hostnames)+'</div></div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn btn-secondary btn-sm" data-copy-text="'+attr(ip)+'">Copy IP</button><a href="https://www.shodan.io/host/'+encodeURIComponent(ip)+'" target="_blank" rel="noopener noreferrer" class="btn btn-outline-accent btn-sm">Shodan ↗</a></div></div>';
+    }).join('');
+    recordStat('scans'); recordChannelStat('Shodan',matches.length>0);
+    addHistoryItem('Shodan',query,matches.length+' hosts');
+    showToast('Shodan: '+matches.length+' hosts','success');
+  }catch(err){
+    container.innerHTML = '<div class="alert alert-amber"><strong>Shodan Error:</strong> '+esc(err.message)+'<br><small>Jika CORS, set proxy di Settings.</small></div>';
+    showToast(err.message,'error');
+  }
+}
+
+async function executeCensys(){
+  var apiId = nt($('censysApiId').value), apiSecret = nt($('censysApiSecret').value), query = nt($('censysQuery').value);
+  var container = $('censysResultsList'), badge = $('censysCountBadge');
+  if(!apiId||!apiSecret){ showToast('Censys API ID & Secret wajib','error'); return; }
+  if(!query||query.length<3){ showToast('Query min 3 karakter','warning'); return; }
+  container.innerHTML = '<div class="alert alert-info">Executing Censys Search...</div>';
+  try{
+    var rawUrl = 'https://search.censys.io/api/v2/hosts/search?q='+encodeURIComponent(query)+'&per_page=25';
+    var auth = 'Basic '+btoa(apiId+':'+apiSecret);
+    var resp = await fetch(wrapWithCorsProxy(rawUrl),{headers:{'Authorization':auth,'Accept':'application/json'}});
+    var data = await resp.json();
+    if(data.code&&data.code>=400) throw new Error(data.error||('Censys error '+data.code));
+    var hits = (data.result&&data.result.hits)||[];
+    censysResultsCache = hits; badge.textContent = hits.length+' Hosts';
+    if(!hits.length){ container.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:24px">Tidak ada hosts.</div>'; return; }
+    container.innerHTML = hits.map(function(hit){
+      var ip = hit.ip;
+      var asn = (hit.autonomous_system&&hit.autonomous_system.name)||('AS'+((hit.autonomous_system&&hit.autonomous_system.asn)||'?'));
+      var services = (hit.services||[]).map(function(s){return s.port+'/'+(s.service_name||'tcp')}).join(', ')||'-';
+      var loc = [hit.location&&hit.location.city, hit.location&&hit.location.country].filter(Boolean).join(', ')||'Global';
+      return '<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--font-mono);font-weight:700;color:var(--accent-cyan)">'+esc(ip)+'</span><span class="badge badge-purple">'+esc(asn)+'</span><span class="badge badge-cyan">'+esc(loc)+'</span></div><div style="color:var(--text-main);font-size:13px;margin-top:4px"><strong>Services:</strong> '+esc(services)+'</div></div><div style="display:flex;gap:6px"><button class="btn btn-secondary btn-sm" data-copy-text="'+attr(ip)+'">Copy IP</button><a href="https://search.censys.io/hosts/'+encodeURIComponent(ip)+'" target="_blank" rel="noopener noreferrer" class="btn btn-outline-accent btn-sm">Censys ↗</a></div></div>';
+    }).join('');
+    recordStat('scans'); recordChannelStat('Censys',hits.length>0);
+    addHistoryItem('Censys',query,hits.length+' hosts');
+    showToast('Censys: '+hits.length+' hosts','success');
+  }catch(err){
+    container.innerHTML = '<div class="alert alert-amber"><strong>Censys Error:</strong> '+esc(err.message)+'<br><small>Censys sering block CORS. Set proxy di Settings.</small></div>';
+    showToast(err.message,'error');
+  }
+}
+
+var SAMPLE_PROGRAMS = {
+  security: {
+    in_scope: [
+      {asset_identifier:'*.hackerone.com',asset_type:'URL',eligible_for_bounty:true,max_severity:'Critical',instruction:'All subdomains'},
+      {asset_identifier:'api.hackerone.com',asset_type:'URL',eligible_for_bounty:true,max_severity:'Critical',instruction:'REST API v1'},
+      {asset_identifier:'hackerone-ext-content.com',asset_type:'URL',eligible_for_bounty:true,max_severity:'High',instruction:'Static assets'}
+    ],
+    out_of_scope: [{asset_identifier:'support.hackerone.com',asset_type:'URL',reason:'Third-party Zendesk'}]
+  },
+  shopify: {
+    in_scope: [
+      {asset_identifier:'*.myshopify.com',asset_type:'URL',eligible_for_bounty:true,max_severity:'Critical',instruction:'Merchant app'},
+      {asset_identifier:'shopify.com',asset_type:'URL',eligible_for_bounty:true,max_severity:'Critical',instruction:'Marketing portal'}
+    ],
+    out_of_scope: [{asset_identifier:'community.shopify.com',asset_type:'URL',reason:'Third-party forum'}]
+  }
+};
+function renderScopeTables(inS,outS){
+  currentInScopeAssets = inS; currentOutScopeAssets = outS;
+  $('h1InScopeCount').textContent = inS.length+' In-Scope';
+  $('h1OutScopeCount').textContent = outS.length+' Out-of-Scope';
+  var inB = $('h1InScopeBody'), outB = $('h1OutScopeBody');
+  inB.innerHTML = !inS.length ? '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:20px">Belum ada.</td></tr>' :
+    inS.map(function(a){return '<tr><td style="font-weight:700;color:var(--accent-cyan)">'+esc(a.asset_identifier||a.target)+'</td><td><span class="badge badge-purple">'+esc(a.asset_type||'URL')+'</span></td><td>'+(a.eligible_for_bounty?'<span class="badge badge-green">✓</span>':'<span class="badge badge-amber">✗</span>')+'</td><td><span class="badge badge-red">'+esc(a.max_severity||'Critical')+'</span></td><td style="color:var(--text-muted);font-size:12px">'+esc(a.instruction||'-')+'</td></tr>'}).join('');
+  outB.innerHTML = !outS.length ? '<tr><td colspan="3" style="text-align:center;color:var(--text-dim);padding:20px">Belum ada.</td></tr>' :
+    outS.map(function(a){return '<tr><td style="font-weight:700;color:var(--accent-red)">'+esc(a.asset_identifier||a.target)+'</td><td><span class="badge badge-purple">'+esc(a.asset_type||'URL')+'</span></td><td style="color:var(--text-muted);font-size:12px">'+esc(a.reason||'Out of Scope')+'</td></tr>'}).join('');
+}
+function loadSampleH1(){
+  var h = nt($('h1Handle').value).toLowerCase()||'security';
+  var s = SAMPLE_PROGRAMS[h]||SAMPLE_PROGRAMS['security'];
+  renderScopeTables(s.in_scope,s.out_of_scope);
+  showToast('Loaded sample scope for "'+h+'"','success');
+}
+async function fetchH1Scope(){
+  var h = nt($('h1Handle').value);
+  if(!h||!/^[a-z0-9_-]+$/i.test(h)){ showToast('Handle tidak valid','warning'); return; }
+  showToast('Fetching scope untuk '+h+'...','info');
+  try{
+    var resp = await fetch(wrapWithCorsProxy('https://hackerone.com/teams/'+encodeURIComponent(h)+'/assets.json'));
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    var data = await resp.json();
+    var inS = (data.in_scope||[]).map(function(i){return {asset_identifier:i.asset_identifier||i.identifier,asset_type:i.asset_type,eligible_for_bounty:i.eligible_for_bounty!==false,max_severity:i.max_severity||'Critical',instruction:i.instruction||''}});
+    var outS = (data.out_of_scope||[]).map(function(o){return {asset_identifier:o.asset_identifier||o.identifier,asset_type:o.asset_type,reason:o.instruction||'Out of scope'}});
+    renderScopeTables(inS,outS);
+    addHistoryItem('H1 Scope',h,inS.length+' in-scope');
+    showToast('Fetched '+inS.length+' in-scope','success');
+  }catch(err){
+    if(SAMPLE_PROGRAMS[h.toLowerCase()]){ var fb = SAMPLE_PROGRAMS[h.toLowerCase()]; renderScopeTables(fb.in_scope,fb.out_of_scope); showToast('CORS blocked. Loaded sample.','warning'); }
+    else { showToast('Fetch blocked ('+err.message+'). Paste JSON.','error'); $('colScopeImport').classList.add('open'); }
+  }
+}
+function parseCustomH1Json(){
+  var raw = nt($('h1CustomJson').value); if(!raw){ showToast('Paste JSON dulu','warning'); return; }
+  try{
+    var p = JSON.parse(raw);
+    var inS = [], outS = [];
+    if(p.targets){ inS = p.targets.in_scope||[]; outS = p.targets.out_of_scope||[]; }
+    else if(p.in_scope){ inS = p.in_scope; outS = p.out_of_scope||[]; }
+    else if(Array.isArray(p)) inS = p;
+    renderScopeTables(inS,outS);
+    showToast('Parsed '+inS.length+' in-scope','success');
+  }catch(e){ showToast('Invalid JSON: '+e.message,'error'); }
+}
+function getCleanDomainList(){
+  return currentInScopeAssets.map(function(a){return a.asset_identifier||a.target||''}).filter(Boolean)
+    .map(function(d){return d.replace(/^\*\./,'').replace(/^https?:\/\//i,'').replace(/\/.*$/,'')})
+    .filter(function(d){return d && d.indexOf('/')<0 && d.indexOf(' ')<0});
+}
+function exportScopeCsv(){
+  if(!currentInScopeAssets.length){ showToast('No scope data','warning'); return; }
+  var rows = ['Target,Type,ScopeStatus,BountyEligible,Severity,Instructions'];
+  currentInScopeAssets.forEach(function(a){rows.push('"'+a.asset_identifier+'","'+a.asset_type+'","InScope",'+(a.eligible_for_bounty?'YES':'NO')+',"'+(a.max_severity||'')+'","'+((a.instruction||'').replace(/"/g,'""'))+'"')});
+  currentOutScopeAssets.forEach(function(a){rows.push('"'+a.asset_identifier+'","'+a.asset_type+'","OutOfScope",NO,"None","'+((a.reason||'').replace(/"/g,'""'))+'"')});
+  downloadFile(rows.join('\n'),'h1_program_scope.csv','text/csv');
+}
+function exportScopeMd(){
+  if(!currentInScopeAssets.length){ showToast('No scope','warning'); return; }
+  var md = ['# HackerOne Scope','Exported: '+new Date().toISOString(),'','## In-Scope','| Target | Type | Bounty | Severity | Notes |','|---|---|---|---|---|'];
+  currentInScopeAssets.forEach(function(a){md.push('| `'+a.asset_identifier+'` | '+a.asset_type+' | '+(a.eligible_for_bounty?'✓':'✗')+' | '+(a.max_severity||'-')+' | '+(a.instruction||'-')+' |')});
+  downloadFile(md.join('\n'),'h1_scope.md','text/markdown');
+}
+
+function runTool(tool){
+  recordToolUsage(tool);
+  // Tambahkan URL untuk tools yang baru
+  var urlTools = { 
+    crtsh:'https://crt.sh/', shodan:'https://www.shodan.io/', whois:'https://who.is/', 
+    geoip:'https://ipinfo.io/', cache:'https://webcache.googleusercontent.com/', reverseip:'https://viewdns.info/reverseip/',
+    censys:'https://search.censys.io/', urlscan:'https://urlscan.io/', virustotal:'https://www.virustotal.com/',
+    intelx:'https://intelx.io/', greynoise:'https://www.greynoise.io/', hunter:'https://hunter.io/',
+    haveibeenpwned:'https://haveibeenpwned.com/', pastebin:'https://pastebin.com/', nerdydata:'https://www.nerdydata.com/',
+    socialsearcher:'https://www.social-searcher.com/', spiderfoot:'https://www.spiderfoot.net/'
+  };
+  
+  if(urlTools[tool]){ window.open(urlTools[tool],'_blank','noopener'); showToast('Opened '+tool+' in new tab','success'); addHistoryItem('Tool',tool,'Opened URL'); return; }
+  
+  // Tambahkan command template untuk tools baru
+  var cmdMap = {
+    subfinder:'subfinder -d TARGET -all -silent -o subs.txt',
+    amass:'amass enum -passive -d TARGET -o amass.txt',
+    assetfinder:'assetfinder --subs-only TARGET | tee assetfinder.txt',
+    httpx:'httpx -l subs.txt -title -tech-detect -status-code -o live.txt',
+    dnsx:'dnsx -l subs.txt -resp -a -cname -silent',
+    naabu:'naabu -host TARGET -p 80,443,8000-9000 -silent',
+    nmap:'nmap -sV -sC -p 80,443,8080,8443 TARGET',
+    masscan:'masscan -p1-65535 --rate=10000 TARGET',
+    ffuf:'ffuf -u https://TARGET/FUZZ -w wordlist.txt -mc 200,301,302,403',
+    feroxbuster:'feroxbuster -u https://TARGET -t 50 -x php,html,json',
+    dirsearch:'dirsearch -u https://TARGET -e php,asp,aspx,json,xml',
+    katana:'katana -u https://TARGET -jc -d 3 -o katana.txt',
+    gospider:'gospider -s https://TARGET -d 3 -o output',
+    gau:'gau TARGET --threads 5 | uro | tee gau_urls.txt',
+    waybackurls:'waybackurls TARGET | uro | tee wayback.txt',
+    alterx:'echo "api" | alterx -p "{{word}}-{{env}}" -env "dev,staging,prod"',
+    shuffledns:'shuffledns -d TARGET -w wordlist.txt -r resolvers.txt -o discovered.txt',
+    puredns:'puredns bruteforce wordlist.txt TARGET -r resolvers.txt',
+    nuclei:'nuclei -l live_urls.txt -t cves/ -t exposures/',
+    dalfox:'dalfox file urls.txt --output dalfox_results.txt',
+    arjun:'arjun -u https://TARGET/api/endpoint',
+    theharvester:'theHarvester -d TARGET -b all',
+    sherlock:'sherlock USERNAME',
+    maigret:'maigret USERNAME',
+    blackbird:'blackbird -u USERNAME',
+    spiderfoot:'spiderfoot -s TARGET -q -o spiderfoot_results.json',
+    trufflehog:'trufflehog github --org=ORG --token=$GITHUB_TOKEN --only-verified --json'
+  };
+  
+  if(cmdMap[tool]){ copyToClipboard(cmdMap[tool],'Command template disalin! Paste di terminal.'); addHistoryItem('Tool',tool,'Command template copied'); return; }
+  
+  showToast('Tool "'+tool+'" aktif.','info'); addHistoryItem('Tool',tool,'Activated');
+}
+var COMMAND_TEMPLATES = [
+  // === Subdomain Recon ===
+  {id:'subfinder',name:'Subfinder — Passive Subdomain Enumeration',category:'Subdomain Recon',build:function(t,i,o,th){return 'subfinder -d '+t+' -all -silent -t '+th+' -o '+o+'/subs_'+t+'.txt'}},
+  {id:'assetfinder',name:'Assetfinder — Cert & API Subdomains',category:'Subdomain Recon',build:function(t,i,o){return 'assetfinder --subs-only '+t+' | tee '+o+'/assetfinder_'+t+'.txt'}},
+  {id:'amass',name:'Amass — OWASP In-Depth DNS Enum',category:'Subdomain Recon',build:function(t,i,o){return 'amass enum -passive -d '+t+' -o '+o+'/amass_'+t+'.txt'}},
+  {id:'shuffledns',name:'ShuffleDNS — DNS Bruteforce + Wildcard',category:'Subdomain Recon',build:function(t,i,o,th){return 'shuffledns -d '+t+' -w wordlist.txt -r resolvers.txt -t '+th+' -o '+o+'/shuffledns.txt'}},
+
+  // === HTTP Probing & DNS ===
+  {id:'httpx',name:'HTTPX — Live Host Probing & Tech Detect',category:'HTTP Probing',build:function(t,i,o,th,w,h){return 'httpx -l '+i+' -title -tech-detect -status-code -ip -cname -threads '+th+' -H "'+h+'" -silent -o '+o+'/live_hosts.txt'}},
+  {id:'dnsx',name:'DNSX — DNS Resolver Toolkit',category:'DNS Resolution',build:function(t,i,o,th){return 'dnsx -l '+i+' -resp -a -cname -silent -t '+th+' -o '+o+'/resolved_dns.txt'}},
+  {id:'naabu',name:'Naabu — Fast Port Scanner',category:'Port Scanning',build:function(t,i,o,th){return 'naabu -list '+i+' -top-ports 1000 -c '+th+' -silent -o '+o+'/naabu_ports.txt'}},
+  {id:'nmap',name:'Nmap — Service & Version Detection',category:'Port Scanning',build:function(t,i,o){return 'nmap -sV -sC -p- -iL '+i+' -oA '+o+'/nmap_scan'}},
+
+  // === Crawling & Archive ===
+  {id:'katana',name:'Katana — Next-Gen Crawler (JS Parsing)',category:'Crawling',build:function(t,i,o,th,w,h){return 'katana -u https://'+t+' -d 3 -jc -kf all -c '+th+' -H "'+h+'" -silent -o '+o+'/katana.txt'}},
+  {id:'gospider',name:'Gospider — Fast Web Spider',category:'Crawling',build:function(t,i,o,th){return 'gospider -s https://'+t+' -d 3 -t '+th+' -o '+o+'/gospider/'}},
+  {id:'gau',name:'GAU — Get All URLs (Archive + AlienVault)',category:'Archive Recon',build:function(t,i,o){return 'gau '+t+' --threads 5 --blacklist png,jpg,gif,css | uro | tee '+o+'/gau_urls.txt'}},
+  {id:'waybackurls',name:'Waybackurls — Wayback Machine URLs',category:'Archive Recon',build:function(t,i,o){return 'waybackurls '+t+' | uro | tee '+o+'/wayback.txt'}},
+
+  // === Content Discovery ===
+  {id:'ffuf',name:'FFUF — Fast Directory & Param Fuzzing',category:'Content Discovery',build:function(t,i,o,th,w,h){return 'ffuf -u https://'+t+'/FUZZ -w '+w+' -mc 200,301,302,403 -c -v -t '+th+' -H "'+h+'" -o '+o+'/ffuf.json'}},
+  {id:'feroxbuster',name:'Feroxbuster — Recursive Content Discovery',category:'Content Discovery',build:function(t,i,o,th){return 'feroxbuster -u https://'+t+' -t '+th+' -k -d 3 -x php,html,json,js,log,txt,bak,old,zip,tar,gz'}},
+  {id:'dirsearch',name:'Dirsearch — Directory Scanner',category:'Content Discovery',build:function(t,i,o){return 'dirsearch -u https://'+t+' -e php,asp,aspx,jsp,json,xml,txt,log,ini,cfg,conf,bak,old,backup,zip,tar,gz,rar,sql,swp,db -t 80 -r -R 3'}},
+  {id:'arjun',name:'Arjun — HTTP Parameter Discovery',category:'Content Discovery',build:function(t,i,o){return 'arjun -u https://'+t+'/api/endpoint -m GET,POST -oJ '+o+'/arjun_params.json'}},
+
+  // === Vuln Scanning ===
+  {id:'nuclei',name:'Nuclei — Template-Based Vulnerability Scan',category:'Vuln Scanning',build:function(t,i,o,th){return 'nuclei -l '+i+' -t cves/ -t exposures/ -t takeovers/ -t misconfiguration/ -c '+th+' -o '+o+'/nuclei_results.txt'}},
+  {id:'dalfox',name:'Dalfox — XSS Scanner + DOM Analysis',category:'Vuln Scanning',build:function(t,i,o){return 'dalfox file '+i+' --output '+o+'/dalfox_results.txt --deep-domxss --mining-dom'}},
+  {id:'sqlmap',name:'SQLMap — SQL Injection Detection',category:'Vuln Scanning',build:function(t,i,o){return 'sqlmap -u "https://'+t+'/?id=1" --batch --level=3 --risk=2 --output-dir='+o+'/sqlmap/'}},
+
+  // === Source Code ===
+  {id:'trufflehog',name:'TruffleHog — Secret Scanning in Git',category:'Source Code',build:function(t,i,o){return 'trufflehog github --org='+t+' --token=$GITHUB_TOKEN --only-verified --json > '+o+'/trufflehog_'+t+'.json'}},
+  {id:'gitleaks',name:'Gitleaks — Git Secret Leak Detection',category:'Source Code',build:function(t,i,o){return 'gitleaks detect --source=. --report-path='+o+'/gitleaks_report.json'}},
+
+  // === Full Pipeline ===
+  {id:'pipeline_subs_httpx',name:'Pipeline ⚡ — Subfinder → HTTPX',category:'Full Pipeline',build:function(t,i,o,th,w,h){return 'subfinder -d '+t+' -all -silent | httpx -silent -title -tech-detect -status-code -H "'+h+'" -o '+o+'/live_'+t+'.txt'}},
+  {id:'pipeline_full_sweep',name:'Pipeline ⚡ — Full Passive Sweep',category:'Full Pipeline',build:function(t,i,o){return 'mkdir -p '+o+' && subfinder -d '+t+' -silent > /tmp/subs.txt && assetfinder --subs-only '+t+' >> /tmp/subs.txt && sort -u /tmp/subs.txt | httpx -silent -sc -title -tech-detect -o '+o+'/active_subs.txt'}},
+  {id:'pipeline_wayback_sensitive',name:'Pipeline ⚡ — Wayback Sensitive File Mining',category:'Full Pipeline',build:function(t,i,o){return 'waybackurls https://'+t+' | grep -E "\\\\.(xls|xlsx|csv|sql|db|bak|backup|old|tar\\\\.gz|tgz|zip|7z|rar|pdf|pem|key|crt|env|json|yml|yaml|conf|config|git|htpasswd|log|dump|DS_Store)" | sort -u > '+o+'/sensitive_wayback.txt'}},
+  {id:'pipeline_nuclei_auto',name:'Pipeline ⚡ — Subfinder → HTTPX → Nuclei',category:'Full Pipeline',build:function(t,i,o,th){return 'subfinder -d '+t+' -silent | httpx -silent | nuclei -t cves/ -t exposures/ -t takeovers/ -c '+th+' -o '+o+'/nuclei_auto.txt'}}
+];
+
+function renderCommandCards(){
+  var target = nt($('cmdTarget').value)||'example.com';
+  var input = nt($('cmdInputFile').value)||'subdomains.txt';
+  var outDir = nt($('cmdOutputDir').value)||'recon_output';
+  var threads = nt($('cmdThreads').value)||'50';
+  var wl = nt($('cmdWordlist').value)||'/usr/share/wordlists/dir.txt';
+  var header = nt($('cmdHeader').value)||'X-Bug-Bounty: researcher';
+  var c = $('commandCardsContainer'); if(!c) return;
+  c.innerHTML = COMMAND_TEMPLATES.map(function(t){
+    var cmd = t.build(target,input,outDir,threads,wl,header);
+    return '<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><span style="font-weight:700;font-size:14px">'+esc(t.name)+'</span><span class="badge badge-purple" style="margin-left:8px">'+esc(t.category)+'</span></div><button class="btn btn-secondary btn-sm" data-copy-text="'+attr(cmd)+'" data-copy-label="Command copied!">Copy</button></div><div class="output-box" style="padding:10px;max-height:80px;font-size:13px;color:var(--accent-cyan)">'+esc(cmd)+'</div></div>';
+  }).join('');
+}
+function downloadReconScript(){
+  var target = nt($('cmdTarget').value)||'example.com';
+  var outDir = nt($('cmdOutputDir').value)||'recon_output';
+  var threads = nt($('cmdThreads').value)||'50';
+  var header = nt($('cmdHeader').value)||'X-Bug-Bounty: researcher';
+  var script = '#!/usr/bin/env bash\n# LinuxPloiter Recon Script\n# Target: '+target+'\n# Generated: '+new Date().toISOString()+'\n\nset -euo pipefail\n\nTARGET="'+target+'"\nOUTDIR="'+outDir+'"\nTHREADS="'+threads+'"\nHEADER="'+header+'"\n\necho "[+] Recon untuk $TARGET"\nmkdir -p "$OUTDIR"\n\necho "[*] Subfinder..."\nsubfinder -d "$TARGET" -all -silent -t "$THREADS" -o "$OUTDIR/subfinder.txt"\n\necho "[*] Assetfinder..."\nassetfinder --subs-only "$TARGET" > "$OUTDIR/assetfinder.txt"\n\ncat "$OUTDIR/subfinder.txt" "$OUTDIR/assetfinder.txt" | sort -u > "$OUTDIR/all_subs.txt"\n\necho "[*] HTTPX..."\nhttpx -l "$OUTDIR/all_subs.txt" -title -tech-detect -status-code -threads "$THREADS" -H "$HEADER" -silent -o "$OUTDIR/live_hosts.txt"\n\necho "[*] GAU..."\ngau "$TARGET" --threads 5 | uro > "$OUTDIR/gau_urls.txt" || true\n\necho "[✓] Done! Cek $OUTDIR/"\n';
+  downloadFile(script,'recon_'+target+'.sh','application/x-sh');
+}
+
+function buildReconReport(){
+  return {
+    exportedAt: new Date().toISOString(),
+    summary: {
+      dorks: generatedDorksCache.length,
+      googleResults: googleResultsCache.length,
+      securityTxtResults: scannedResultsList.length,
+      shodanHosts: shodanResultsCache.length,
+      censysHosts: censysResultsCache.length,
+      inScopeAssets: currentInScopeAssets.length,
+      outOfScopeAssets: currentOutScopeAssets.length,
+      historyItems: getHistory().length,
+      bountyEntries: loadBountyTracker().length
+    },
+    results: {
+      dorks: generatedDorksCache,
+      google: googleResultsCache,
+      securityTxt: scannedResultsList,
+      shodan: shodanResultsCache,
+      censys: censysResultsCache,
+      h1Scope: {inScope: currentInScopeAssets, outOfScope: currentOutScopeAssets},
+      bounty: loadBountyTracker(),
+      history: getHistory()
+    }
+  };
+}
+function exportReportJson(){
+  var report = buildReconReport();
+  var total = Object.keys(report.summary).reduce(function(a,k){return a+(typeof report.summary[k]==='number'?report.summary[k]:0)},0);
+  if(!total){ showToast('No results to export','warning'); return; }
+  downloadFile(JSON.stringify(report,null,2),'linuxploiter_report.json','application/json');
+}
+function exportReportCsv(){
+  var report = buildReconReport();
+  var rows = [['Category','Identifier','Status','Details']];
+  function addRow(){ var args = Array.prototype.slice.call(arguments); rows.push(args.map(function(v){ var t = v==null?'':(typeof v==='string'?v:JSON.stringify(v)); return '"'+t.replace(/"/g,'""')+'"'; })); }
+  report.results.dorks.forEach(function(q){addRow('Dork',q,'Generated','')});
+  report.results.google.forEach(function(i){addRow('Google',i.link||i.title,'Result',i.snippet||i.title)});
+  report.results.securityTxt.forEach(function(i){addRow('security.txt',i.domain,i.status,(i.path||'')+'; '+(i.latency||0)+'ms')});
+  report.results.shodan.forEach(function(i){addRow('Shodan',i.ip_str||i.ip,'Host',(i.port||'')+'; '+(i.org||''))});
+  report.results.censys.forEach(function(i){addRow('Censys',i.ip||i.name,'Host','')});
+  report.results.h1Scope.inScope.forEach(function(i){addRow('H1 Scope',i.asset_identifier||i.target,'In scope','')});
+  report.results.bounty.forEach(function(i){addRow('Bounty',i.program,i.status,(i.vulnerability||'')+'; '+(i.reward||''))});
+  report.results.history.forEach(function(i){addRow('History',i.query,i.tab,(i.timestamp||'')+'; '+(i.details||''))});
+  if(rows.length===1){ showToast('No results','warning'); return; }
+  var csv = rows.map(function(r){return r.map(function(v){var t=v==null?'':String(v);return '"'+t.replace(/"/g,'""')+'"'}).join(',')}).join('\r\n');
+  downloadFile(csv,'linuxploiter_report.csv','text/csv;charset=utf-8');
+}
+
+function populateSettingsInputs(){
+  var keys = loadSavedKeys();
+  var map = {'settingCorsProxy':'corsProxy','modalGoogleApiKey':'googleApiKey','modalGoogleCx':'googleCx','modalShodanApiKey':'shodanApiKey','modalCensysId':'censysId','modalCensysSecret':'censysSecret','modalGeminiKey':'geminiApiKey','modalGroqKey':'groqApiKey','modalVulnersKey':'vulnersApiKey','modalNvdKey':'nvdApiKey','modalH1Token':'hackeroneToken','modalBugcrowdToken':'bugcrowdToken','modalIntigritiToken':'intigritiToken','modalYesWeHackToken':'yeswehackToken','googleApiKey':'googleApiKey','googleCx':'googleCx','shodanApiKey':'shodanApiKey','censysApiId':'censysId','censysApiSecret':'censysSecret'};
+  Object.keys(map).forEach(function(elId){ var el = $(elId); if(el) el.value = keys[map[elId]]||''; });
+}
+
+function bindEvents(){
+  var themeBtn = $('btnThemeToggle');
+  if(themeBtn) themeBtn.addEventListener('click',function(){
+    var isLight = document.body.getAttribute('data-theme')==='light';
+    if(isLight){ document.body.removeAttribute('data-theme'); localStorage.setItem(SK.THEME,'dark'); showToast('Dark theme','info'); }
+    else { document.body.setAttribute('data-theme','light'); localStorage.setItem(SK.THEME,'light'); showToast('Light theme','info'); }
+  });
+
+  var nav = $('mainTabNav');
+  if(nav) nav.addEventListener('click',function(e){
+    var btn = e.target.closest('.tab-btn'); if(!btn) return;
+    var tid = btn.getAttribute('data-tab');
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+    document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active')});
+    btn.classList.add('active');
+    var pane = $(tid); if(pane) pane.classList.add('active');
+    if(tid==='tab-dashboard') renderDashboard();
+    saveFormState();
+  });
+
+  document.querySelectorAll('.collapsible-trigger').forEach(function(tr){
+    tr.addEventListener('click',function(){ tr.parentElement.classList.toggle('open'); });
+  });
+
+  document.querySelectorAll('#dorkPlatformChips .chip, #dorkPathChips .chip, #dorkKeywordChips .chip').forEach(function(chip){
+    chip.addEventListener('click',function(){ chip.classList.toggle('active'); });
+  });
+
+  document.querySelectorAll('[data-shodan-preset]').forEach(function(chip){
+    chip.addEventListener('click',function(){ $('shodanQuery').value = chip.getAttribute('data-shodan-preset'); });
+  });
+  document.querySelectorAll('[data-censys-preset]').forEach(function(chip){
+    chip.addEventListener('click',function(){ $('censysQuery').value = chip.getAttribute('data-censys-preset'); });
+  });
+  document.querySelectorAll('[data-h1-handle]').forEach(function(chip){
+    chip.addEventListener('click',function(){ $('h1Handle').value = chip.getAttribute('data-h1-handle'); });
+  });
+
+  var settingsModal = $('settingsModal');
+  $('btnSettingsModal').addEventListener('click',function(){ populateSettingsInputs(); settingsModal.classList.add('active'); });
+  $('btnCloseSettingsModal').addEventListener('click',function(){ settingsModal.classList.remove('active'); });
+  $('btnSaveSettings').addEventListener('click',function(){
+    var keys = {
+      corsProxy: nt($('settingCorsProxy').value),
+      googleApiKey: nt($('modalGoogleApiKey').value),
+      googleCx: nt($('modalGoogleCx').value),
+      shodanApiKey: nt($('modalShodanApiKey').value),
+      censysId: nt($('modalCensysId').value),
+      censysSecret: nt($('modalCensysSecret').value),
+      geminiApiKey: nt($('modalGeminiKey').value),
+      groqApiKey: nt($('modalGroqKey').value),
+      vulnersApiKey: nt($('modalVulnersKey').value),
+      nvdApiKey: nt($('modalNvdKey').value),
+      hackeroneToken: nt($('modalH1Token').value),
+      bugcrowdToken: nt($('modalBugcrowdToken').value),
+      intigritiToken: nt($('modalIntigritiToken').value),
+      yeswehackToken: nt($('modalYesWeHackToken').value)
+    };
+    saveKeys(keys); populateSettingsInputs(); settingsModal.classList.remove('active');
+  });
+  $('btnClearAllKeys').addEventListener('click',function(){
+    if(confirm('Clear all API keys?')){ localStorage.removeItem(SK.API_KEYS); populateSettingsInputs(); showToast('Cleared','info'); }
+  });
+  $('btnExportSettingsJson').addEventListener('click',function(){
+    var payload = {apiKeys:loadSavedKeys(),theme:localStorage.getItem(SK.THEME)||'dark',formState:JSON.parse(localStorage.getItem(SK.FORM_STATE)||'{}'),history:getHistory(),bounty:loadBountyTracker(),profile:loadProfile(),exportedAt:new Date().toISOString()};
+    downloadFile(JSON.stringify(payload,null,2),'linuxploiter_settings.json','application/json');
+  });
+  $('btnImportSettingsJson').addEventListener('click',function(){ $('importSettingsFile').click(); });
+  $('importSettingsFile').addEventListener('change',async function(ev){
+    var f = ev.target.files&&ev.target.files[0]; if(!f) return;
+    try{
+      var txt = await f.text(); var p = JSON.parse(txt);
+      if(p.apiKeys) localStorage.setItem(SK.API_KEYS,JSON.stringify(p.apiKeys));
+      if(p.theme) localStorage.setItem(SK.THEME,p.theme);
+      if(p.formState) localStorage.setItem(SK.FORM_STATE,JSON.stringify(p.formState));
+      if(p.history) localStorage.setItem(SK.HISTORY,JSON.stringify(p.history));
+      if(p.bounty) localStorage.setItem(SK.BOUNTY,JSON.stringify(p.bounty));
+      if(p.profile) localStorage.setItem(SK.PROFILE,JSON.stringify(p.profile));
+      if(p.theme==='light') document.body.setAttribute('data-theme','light'); else document.body.removeAttribute('data-theme');
+      populateSettingsInputs(); restoreFormState(); renderHistory(); renderBountyTable(); renderAvatar();
+      showToast('Imported','success');
+    }catch(e){ showToast('Invalid file','error'); }
+    ev.target.value = '';
+  });
+  $('btnResetDefaultSettings').addEventListener('click',function(){
+    if(!confirm('Reset semua settings?')) return;
+    [SK.API_KEYS,SK.FORM_STATE,SK.THEME,SK.HISTORY].forEach(function(k){localStorage.removeItem(k)});
+    document.body.removeAttribute('data-theme');
+    populateSettingsInputs(); restoreFormState(); renderHistory();
+    showToast('Reset','info');
+  });
+
+  ['googleApiKey','googleCx','shodanApiKey','censysApiId','censysApiSecret'].forEach(function(id){
+    var el = $(id); if(!el) return;
+    el.addEventListener('change',function(){
+      var k = loadSavedKeys();
+      if(id==='googleApiKey') k.googleApiKey = el.value.trim();
+      if(id==='googleCx') k.googleCx = el.value.trim();
+      if(id==='shodanApiKey') k.shodanApiKey = el.value.trim();
+      if(id==='censysApiId') k.censysId = el.value.trim();
+      if(id==='censysApiSecret') k.censysSecret = el.value.trim();
+      saveKeys(k);
+    });
+  });
+
+  var hd = $('historyDrawer'), ho = $('historyOverlay');
+  $('btnHistoryDrawer').addEventListener('click',function(){ renderHistory(); hd.classList.add('active'); ho.classList.add('active'); });
+  function closeHD(){ hd.classList.remove('active'); ho.classList.remove('active'); }
+  $('btnCloseHistoryDrawer').addEventListener('click',closeHD);
+  ho.addEventListener('click',closeHD);
+  $('btnClearHistory').addEventListener('click',function(){
+    if(confirm('Clear history?')){ localStorage.removeItem(SK.HISTORY); renderHistory(); showToast('Cleared','info'); }
+  });
+
+  var insM = $('inspectorModal');
+  $('btnCloseInspector').addEventListener('click',function(){ insM.classList.remove('active'); });
+  $('btnCopyInspector').addEventListener('click',function(){ copyToClipboard($('inspectorContent').textContent,'Copied'); });
+
+  document.addEventListener('click',function(e){
+    var cp = e.target.closest('[data-copy-text]');
+    if(cp){ copyToClipboard(cp.getAttribute('data-copy-text')||'', cp.getAttribute('data-copy-label')||'Copied!'); return; }
+    var gd = e.target.closest('[data-google-dork]');
+    if(gd){ $('googleQuery').value = gd.getAttribute('data-google-dork')||''; var tb = document.querySelector('.tab-btn[data-tab="tab-google"]'); if(tb) tb.click(); showToast('Dork loaded','info'); return; }
+    var sv = e.target.closest('[data-security-domain]');
+    if(sv){
+      var dom = sv.getAttribute('data-security-domain');
+      var m = scannedResultsList.filter(function(r){return r.domain===dom})[0];
+      if(m&&m.content){ $('inspectorTitle').textContent = 'security.txt — '+dom; $('inspectorContent').textContent = m.content; insM.classList.add('active'); }
+    }
+  });
+
+  $('btnGenerateDorks').addEventListener('click',generateDorks);
+  $('btnCopyAllDorks').addEventListener('click',function(){ if(!generatedDorksCache.length){showToast('No dorks','warning');return;} copyToClipboard(generatedDorksCache.join('\n'),'Copied '+generatedDorksCache.length+' dorks'); });
+  $('btnImportDorksFile').addEventListener('click',function(){ $('importDorksFile').click(); });
+  $('importDorksFile').addEventListener('change',importDorksFile);
+  $('btnExportDorksTxt').addEventListener('click',function(){exportDorks('txt')});
+  $('btnExportDorksJson').addEventListener('click',function(){exportDorks('json')});
+  $('btnExportDorksCsv').addEventListener('click',function(){exportDorks('csv')});
+  $('btnExportDorksMd').addEventListener('click',function(){exportDorks('md')});
+
+  $('btnExecuteGoogleSearch').addEventListener('click',executeGoogleSearch);
+  $('btnCopyGoogleLinks').addEventListener('click',function(){ if(!googleResultsCache.length){showToast('No links','warning');return;} copyToClipboard(googleResultsCache.map(function(i){return i.link}).join('\n'),'Copied URLs'); });
+  $('btnExportGoogleJson').addEventListener('click',function(){ if(!googleResultsCache.length){showToast('No results','warning');return;} downloadFile(JSON.stringify(googleResultsCache,null,2),'google_results.json','application/json'); });
+
+  $('scanConcurrency').addEventListener('input',function(e){ $('concurrencyValue').textContent = e.target.value; });
+  $('scanTimeout').addEventListener('input',function(e){ $('timeoutValue').textContent = e.target.value; });
+  $('btnStartSecurityScan').addEventListener('click',startSecurityScan);
+  $('btnStopSecurityScan').addEventListener('click',function(){ if(activeScanAbortController){ activeScanAbortController.abort(); activeScanAbortController = null; $('btnStartSecurityScan').disabled = false; $('btnStopSecurityScan').disabled = true; showToast('Stopped','warning'); } });
+  $('btnClearSecurityResults').addEventListener('click',function(){ scannedResultsList=[]; $('securityResultsBody').innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:24px">Belum ada scan.</td></tr>'; $('scanStatTotal').textContent='Total: 0'; $('scanStatFound').textContent='Found: 0'; $('scanStatNotFound').textContent='Not Found: 0'; $('scanStatError').textContent='Errors: 0'; $('scanProgressWrapper').style.display='none'; showToast('Cleared','info'); });
+  $('btnImportDomainsFile').addEventListener('click',function(){ $('importDomainsFile').click(); });
+  $('importDomainsFile').addEventListener('change',async function(ev){ var f = ev.target.files&&ev.target.files[0]; if(!f) return; try{ var txt = await f.text(); var ds = parseDomainList(txt); if(!ds.length) throw 0; $('securityTxtDomains').value = ds.join('\n'); showToast('Imported '+ds.length+' domains','success'); }catch(e){ showToast('Failed','error'); } ev.target.value=''; });
+  $('btnExportSecurityCsv').addEventListener('click',function(){ if(!scannedResultsList.length){showToast('No data','warning');return;} var rows=['Domain,Status,Path,LatencyMS,Contacts,Policy']; scannedResultsList.forEach(function(r){ var c = r.directives?r.directives.contacts.join(';'):''; var p = r.directives?r.directives.policy.join(';'):''; rows.push('"'+r.domain+'","'+r.status+'","'+(r.path||'')+'",'+r.latency+',"'+c.replace(/"/g,'""')+'","'+p.replace(/"/g,'""')+'"'); }); downloadFile(rows.join('\n'),'security_txt_scan.csv','text/csv'); });
+  $('btnExportSecurityJson').addEventListener('click',function(){ if(!scannedResultsList.length){showToast('No data','warning');return;} downloadFile(JSON.stringify(scannedResultsList,null,2),'security_txt_scan.json','application/json'); });
+
+  $('btnExecuteShodan').addEventListener('click',executeShodan);
+  $('btnCopyShodanIps').addEventListener('click',function(){ if(!shodanResultsCache.length){showToast('No IPs','warning');return;} var ips = Array.from(new Set(shodanResultsCache.map(function(m){return m.ip_str}).filter(Boolean))).join('\n'); copyToClipboard(ips,'Copied IPs'); });
+  $('btnExportShodanJson').addEventListener('click',function(){ if(!shodanResultsCache.length){showToast('No data','warning');return;} downloadFile(JSON.stringify(shodanResultsCache,null,2),'shodan_results.json','application/json'); });
+  $('btnExportShodanCsv').addEventListener('click',function(){ if(!shodanResultsCache.length){showToast('No data','warning');return;} var rows=['IP,Port,Org,Hostnames,Location']; shodanResultsCache.forEach(function(m){ var hn = (m.hostnames||[]).join(';'); var loc = [m.location&&m.location.city, m.location&&m.location.country_name].filter(Boolean).join(', '); rows.push('"'+m.ip_str+'",'+m.port+',"'+(m.org||'').replace(/"/g,'""')+'","'+hn.replace(/"/g,'""')+'","'+loc.replace(/"/g,'""')+'"'); }); downloadFile(rows.join('\n'),'shodan_results.csv','text/csv'); });
+
+  $('btnExecuteCensys').addEventListener('click',executeCensys);
+  $('btnCopyCensysIps').addEventListener('click',function(){ if(!censysResultsCache.length){showToast('No IPs','warning');return;} var ips = Array.from(new Set(censysResultsCache.map(function(h){return h.ip}).filter(Boolean))).join('\n'); copyToClipboard(ips,'Copied IPs'); });
+  $('btnExportCensysJson').addEventListener('click',function(){ if(!censysResultsCache.length){showToast('No data','warning');return;} downloadFile(JSON.stringify(censysResultsCache,null,2),'censys_results.json','application/json'); });
+  $('btnExportCensysCsv').addEventListener('click',function(){ if(!censysResultsCache.length){showToast('No data','warning');return;} var rows=['IP,ASN,Services,Location']; censysResultsCache.forEach(function(h){ var asn = (h.autonomous_system&&h.autonomous_system.name)||''; var s = (h.services||[]).map(function(sv){return sv.port+'/'+(sv.service_name||'')}).join(';'); var loc = [h.location&&h.location.city, h.location&&h.location.country].filter(Boolean).join(', '); rows.push('"'+h.ip+'","'+asn.replace(/"/g,'""')+'","'+s.replace(/"/g,'""')+'","'+loc.replace(/"/g,'""')+'"'); }); downloadFile(rows.join('\n'),'censys_results.csv','text/csv'); });
+
+  $('btnFetchH1Scope').addEventListener('click',fetchH1Scope);
+  $('btnLoadSampleH1').addEventListener('click',loadSampleH1);
+  $('btnParseCustomH1Json').addEventListener('click',parseCustomH1Json);
+  $('btnCopyInScopeDomains').addEventListener('click',function(){ var d = Array.from(new Set(getCleanDomainList())); if(!d.length){showToast('No domains','warning');return;} copyToClipboard(d.join('\n'),'Copied '+d.length+' domains'); });
+  $('btnSendToScanner').addEventListener('click',function(){ var d = Array.from(new Set(getCleanDomainList())); if(!d.length){showToast('No domains','warning');return;} $('securityTxtDomains').value = d.join('\n'); var tb = document.querySelector('.tab-btn[data-tab="tab-securitytxt"]'); if(tb) tb.click(); showToast('Transferred '+d.length+' domains','info'); });
+  $('btnSendToCommands').addEventListener('click',function(){ var d = Array.from(new Set(getCleanDomainList())); if(!d.length){showToast('No domains','warning');return;} $('cmdTarget').value = d[0]; var tb = document.querySelector('.tab-btn[data-tab="tab-commands"]'); if(tb) tb.click(); showToast('Set '+d[0],'info'); });
+  $('btnExportScopeCsv').addEventListener('click',exportScopeCsv);
+  $('btnExportScopeMd').addEventListener('click',exportScopeMd);
+
+  ['cmdTarget','cmdInputFile','cmdOutputDir','cmdThreads','cmdWordlist','cmdHeader'].forEach(function(id){ $(id).addEventListener('input',renderCommandCards); });
+  $('btnCopyAllCommands').addEventListener('click',function(){
+    var t = nt($('cmdTarget').value)||'example.com', i = nt($('cmdInputFile').value)||'subdomains.txt', o = nt($('cmdOutputDir').value)||'recon_output', th = nt($('cmdThreads').value)||'50', w = nt($('cmdWordlist').value)||'/usr/share/wordlists/dir.txt', h = nt($('cmdHeader').value)||'X-Bug-Bounty: researcher';
+    var all = COMMAND_TEMPLATES.map(function(cmd){return '# '+cmd.name+'\n'+cmd.build(t,i,o,th,w,h)}).join('\n\n');
+    copyToClipboard(all,'All commands copied');
+  });
+  $('btnDownloadReconScript').addEventListener('click',downloadReconScript);
+
+  $('btnAddBountyEntry').addEventListener('click',addBountyEntry);
+
+  $('btnGenerateReport').addEventListener('click',generateReport);
+  $('btnCopyReport').addEventListener('click',function(){ var md = generateReport(); copyToClipboard(md,'Report copied'); });
+  $('btnDownloadReportMd').addEventListener('click',function(){ var md = generateReport(); downloadFile(md,'vulnerability_report.md','text/markdown'); });
+  $('btnDownloadReportJson').addEventListener('click',function(){
+    generateReport();
+    var d = {program:nt($('reportProgram').value),title:nt($('reportTitle').value),severity:$('reportSeverity').value,description:nt($('reportDescription').value),steps:nt($('reportSteps').value),impact:nt($('reportImpact').value),remediation:nt($('reportRemediation').value),generatedAt:new Date().toISOString()};
+    downloadFile(JSON.stringify(d,null,2),'vulnerability_report.json','application/json');
+  });
+
+  $('btnAnalyzeError').addEventListener('click',analyzeError);
+  $('btnClearError').addEventListener('click',function(){ $('errorInput').value=''; $('errorOutput').textContent='Analisis akan muncul di sini...'; });
+
+  $('guideSearch').addEventListener('input',function(e){ searchGuide(e.target.value); });
+
+  $('btnExportReportJson').addEventListener('click',exportReportJson);
+  $('btnExportReportCsv').addEventListener('click',exportReportCsv);
+
+  var pm = $('profileModal');
+  $('btnProfileModal').addEventListener('click',function(){ pm.classList.add('active'); });
+  $('btnCloseProfileModalBottom').addEventListener('click',function(){ pm.classList.remove('active'); });
+  $('btnCloseProfileModal').addEventListener('click',function(){ pm.classList.remove('active'); });
+  $('btnCancelProfile').addEventListener('click',function(){ pm.classList.remove('active'); });
+  $('btnSaveProfile').addEventListener('click',function(){
+    var p = {name:nt($('profileName').value),email:nt($('profileEmail').value),handle:nt($('profileHandle').value),avatar:loadProfile().avatar||''};
+    saveProfile(p); renderAvatar(); pm.classList.remove('active'); showToast('Profile saved','success');
+  });
+  $('btnUploadAvatar').addEventListener('click',function(){ $('avatarUploadInput').click(); });
+  $('avatarUploadInput').addEventListener('change',function(e){
+    var f = e.target.files&&e.target.files[0]; if(!f) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){ var p = loadProfile(); p.avatar = ev.target.result; saveProfile(p); renderAvatar(); showToast('Avatar updated','success'); };
+    reader.readAsDataURL(f); e.target.value = '';
+  });
+
+  var ls = $('languageSelector');
+  if(ls) ls.addEventListener('change',function(e){ currentLang = e.target.value; localStorage.setItem(SK.LANG,currentLang); showToast('Language: '+currentLang,'info'); });
+
+  document.querySelectorAll('input, textarea, select').forEach(function(el){
+    if(el.id && el.id.indexOf('modal')!==0 && el.id.indexOf('setting')!==0 && el.id.indexOf('profile')!==0 && el.id.indexOf('report')!==0){
+      el.addEventListener('input',saveFormState);
+      el.addEventListener('change',saveFormState);
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  var savedTheme = localStorage.getItem(SK.THEME)||'dark';
+  if(savedTheme==='light') document.body.setAttribute('data-theme','light');
+  renderAvatar();
+  bindEvents();
+  initTools();
+  renderCommunityLinks();
+  renderDonations();
+  populateSettingsInputs();
+  restoreFormState();
+  renderHistory();
+  renderCommandCards();
+  renderBountyTable();
+  renderGuide();
+  renderDashboard();
+  if(!localStorage.getItem(SK.STATS)){
+    var seed = {scans:0,findings:0,dorks:0,tools:{},daily:{},channels:{}};
+    for(var i=6;i>=0;i--){ var key = new Date(Date.now()-i*864e5).toISOString().slice(0,10); seed.daily[key] = {scans:Math.floor(Math.random()*4),findings:Math.floor(Math.random()*2)}; }
+    localStorage.setItem(SK.STATS,JSON.stringify(seed));
+    renderDashboard();
+  }
+  showToast('LinuxPloiter v6.0 loaded','success');
+});
+
+})();
+</script>
+</body>
+</html>
