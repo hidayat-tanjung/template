@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LinuxPloiter — Bug Bounty Companion</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
 :root{color-scheme:dark;--bg-base:#0a0a0f;--bg-surface:#12121a;--bg-surface-elevated:#181824;--bg-input:#0e0e16;--page-background:radial-gradient(circle at top left,rgba(160,32,240,.12),transparent 28%),radial-gradient(circle at bottom right,rgba(0,229,255,.09),transparent 22%),linear-gradient(180deg,#0a0a0f 0%,#111120 100%);--panel-gradient:linear-gradient(180deg,rgba(18,18,26,.96),rgba(12,12,19,.96));--output-background:linear-gradient(180deg,rgba(14,14,22,.9),rgba(17,17,26,.9));--output-color:#d1d1e0;--border:#222233;--border-light:#2d2d42;--accent:#a020f0;--accent-light:#c040ff;--accent-dim:rgba(160,32,240,.15);--accent-glow:rgba(160,32,240,.35);--accent-cyan:#00e5ff;--accent-cyan-dim:rgba(0,229,255,.12);--accent-green:#10b981;--accent-green-dim:rgba(16,185,129,.15);--accent-red:#ef4444;--accent-red-dim:rgba(239,68,68,.15);--accent-amber:#f59e0b;--accent-amber-dim:rgba(245,158,11,.15);--text-main:#f0f0f5;--text-muted:#9595ad;--text-dim:#60607a;--on-accent:#fff;--font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;--font-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--radius-sm:6px;--radius-md:10px;--radius-lg:16px;--transition:all .2s cubic-bezier(.4,0,.2,1)}
 [data-theme="light"]{color-scheme:light;--bg-base:#f4f4fa;--bg-surface:#fff;--bg-surface-elevated:#eaeaf4;--bg-input:#f0f0f6;--page-background:#f4f4fa;--panel-gradient:linear-gradient(180deg,rgba(255,255,255,.96),rgba(245,245,250,.96));--output-background:#edf3f5;--output-color:#263744;--border:#d4d4e4;--border-light:#bcbccf;--accent:#a020f0;--accent-light:#7e22ce;--accent-dim:rgba(160,32,240,.08);--accent-glow:rgba(160,32,240,.15);--accent-cyan:#007c91;--accent-cyan-dim:rgba(0,124,145,.1);--accent-green:#087a53;--accent-green-dim:rgba(8,122,83,.1);--accent-red:#c62828;--accent-amber:#9a5a00;--text-main:#14141e;--text-muted:#5e5e78;--text-dim:#8b8b9e}
@@ -14,8 +15,12 @@ body{background:var(--page-background);background-color:var(--bg-base);color:var
 .app-container{max-width:1480px;width:100%;margin:0 auto;padding:18px 20px 60px;display:flex;flex-direction:column;gap:18px;flex:1}
 
 /* ============ HEADER ============ */
-header.app-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:18px 24px;background:var(--panel-gradient);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:0 12px 32px rgba(16,12,20,.45)}
-.brand{display:flex;align-items:center;gap:14px;flex-shrink:0;padding-top:4px}
+header.app-header{display:flex;flex-direction:column;gap:12px;padding:16px 20px;background:var(--panel-gradient);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:0 12px 32px rgba(16,12,20,.45)}
+.header-row-1{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:nowrap}
+.header-row-1-right{display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:nowrap;justify-content:flex-end;min-width:0}
+.header-row-2{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--border)}
+.header-row-1-right .btn,.header-row-2 .btn{height:38px;padding:0 12px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:12px;flex-shrink:0}
 .brand-icon{width:46px;height:46px;background:linear-gradient(135deg,var(--accent),#ff007f);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;color:var(--on-accent);box-shadow:0 0 20px rgba(160,32,240,.25);flex-shrink:0}
 .brand-text h1{font-size:24px;font-weight:800;display:flex;align-items:center;gap:10px;line-height:1.2;letter-spacing:-.3px}
 .brand-text .panel-subtitle{font-size:13px;color:var(--text-muted);margin-top:3px}
@@ -26,25 +31,36 @@ header.app-header{display:flex;align-items:flex-start;justify-content:space-betw
 .badge-red{background:var(--accent-red-dim);color:var(--accent-red);border:1px solid rgba(239,68,68,.4)}
 .badge-amber{background:var(--accent-amber-dim);color:var(--accent-amber);border:1px solid rgba(245,158,11,.4)}
 
-/* Header actions: 2 baris rata kanan (atas = icon social, bawah = tools) */
-.header-actions{display:flex;flex-direction:column;align-items:flex-end;gap:12px;margin-left:auto}
-.header-actions-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;row-gap:8px}
-#communityLinksHeader{display:flex;align-items:center;gap:8px;justify-content:flex-end}
-#communityLinksHeader a{display:inline-flex!important;align-items:center;justify-content:center;width:42px!important;height:42px!important;padding:0!important;font-size:20px;line-height:1;border-radius:var(--radius-md)!important;transition:var(--transition);flex-shrink:0;background:var(--bg-surface-elevated);border:1px solid var(--border);text-decoration:none;color:var(--text-main)}
+/* Header actions remain on one line on desktop. */
+.header-actions{display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:nowrap;flex-direction:row;min-width:0}
+.header-actions-right{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+#communityLinksHeader{display:flex;align-items:center;gap:4px;flex-shrink:0}
+#communityLinksHeader a{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;font-size:16px;line-height:1;border-radius:var(--radius-md);transition:var(--transition);flex-shrink:0;background:var(--bg-surface-elevated);border:1px solid var(--border);text-decoration:none;color:var(--text-main)}
 #communityLinksHeader a:hover{background:var(--accent-dim);border-color:var(--accent);transform:translateY(-1px)}
 .header-actions .btn,.header-actions select{height:42px;display:inline-flex;align-items:center;gap:7px;padding:0 16px;font-size:14px;font-weight:600;line-height:1;white-space:nowrap;flex-shrink:0;border-radius:var(--radius-md)}
 .header-actions .btn svg{width:18px;height:18px}
 .header-actions select{padding:0 34px 0 14px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--text-muted) 50%),linear-gradient(135deg,var(--text-muted) 50%,transparent 50%);background-position:calc(100% - 18px) 18px,calc(100% - 13px) 18px;background-size:6px 6px,6px 6px;background-repeat:no-repeat;background-color:var(--bg-surface-elevated);border:1px solid var(--border);color:var(--text-main);font-family:var(--font-sans);font-weight:600;font-size:14px;width:150px;min-width:150px;max-width:150px}
-#languageSelector{width:150px!important;min-width:150px!important;max-width:150px!important;text-overflow:ellipsis;overflow:hidden;font-size:14px;font-weight:600}
+#languageSelector{height:38px!important;padding:0 10px!important;font-size:13px!important;font-weight:600;width:auto!important;min-width:80px!important;max-width:100px!important}
 #languageSelector option{width:150px;font-size:14px;padding:8px}
 #userAvatarDisplay{width:28px!important;height:28px!important;border-radius:50%;background:linear-gradient(135deg,var(--accent),#ff007f);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;overflow:hidden}
 #btnProfileModal{padding:0 8px!important;min-width:auto!important}
+.hamburger{display:none;background:transparent;border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-main);padding:8px;cursor:pointer;width:42px;height:42px;align-items:center;justify-content:center;transition:var(--transition);flex-shrink:0}
+.hamburger:hover{border-color:var(--accent);color:var(--accent)}
+.tab-dropdown{position:relative;display:inline-block;flex-shrink:0}
+.tab-dropdown-toggle{display:inline-flex;align-items:center;gap:6px;min-width:180px;justify-content:space-between;background:var(--bg-surface-elevated);border-color:var(--border)}
+.tab-dropdown-toggle:hover{background:var(--bg-input);border-color:var(--accent)}
+.tab-dropdown-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:260px;max-width:min(320px,calc(100vw - 32px));max-height:70vh;overflow-y:auto;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:0 12px 32px rgba(0,0,0,.45);z-index:1050;display:none;padding:6px}
+.tab-dropdown-menu.active{display:block;animation:fadeIn .15s ease}
+.tab-dropdown-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;background:transparent;border:none;border-radius:var(--radius-sm);color:var(--text-muted);font-size:12.5px;font-weight:600;text-align:left;cursor:pointer;transition:var(--transition);font-family:inherit}
+.tab-dropdown-item:hover{background:var(--bg-surface-elevated);color:var(--text-main)}
+.tab-dropdown-item.active{background:linear-gradient(135deg,var(--accent),#8b3cf4);color:#fff}
 
 /* ============ TAB NAV ============ */
 nav.tabs-nav{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:5px;overflow-x:auto;overflow-y:hidden;background:var(--bg-surface);border:1px solid var(--border);padding:7px;border-radius:var(--radius-lg);scrollbar-width:thin;scrollbar-color:var(--border-light) transparent;-webkit-overflow-scrolling:touch;position:sticky;top:10px;z-index:90;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 nav.tabs-nav::-webkit-scrollbar{height:6px}
 nav.tabs-nav::-webkit-scrollbar-track{background:transparent}
 nav.tabs-nav::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px}
+nav.tabs-nav{display:none!important}
 .tab-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;font-size:14px;font-weight:600;color:var(--text-muted);background:transparent;border:none;border-radius:var(--radius-md);cursor:pointer;white-space:nowrap;transition:var(--transition);user-select:none;flex-shrink:0;line-height:1}
 .tab-btn:hover{color:var(--text-main);background:var(--bg-surface-elevated)}
 .tab-btn.active{color:#fff;background:linear-gradient(135deg,var(--accent),#8b3cf4);box-shadow:0 6px 14px var(--accent-glow)}
@@ -121,6 +137,17 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
 .drawer-overlay.active{display:block}
 .drawer{position:fixed;top:0;right:-440px;bottom:0;width:420px;max-width:90vw;background:var(--bg-surface);border-left:1px solid var(--border);z-index:1001;display:flex;flex-direction:column;transition:right .3s cubic-bezier(.16,1,.3,1);box-shadow:-5px 0 25px rgba(0,0,0,.7)}
 .drawer.active{right:0}
+.mobile-menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);z-index:1100;display:none}
+.mobile-menu-overlay.active{display:block}
+.mobile-menu-drawer{position:fixed;top:0;left:-320px;bottom:0;width:300px;max-width:85vw;background:var(--bg-surface);border-right:1px solid var(--border);z-index:1101;display:flex;flex-direction:column;transition:left .3s cubic-bezier(.16,1,.3,1);box-shadow:5px 0 25px rgba(0,0,0,.7);overflow-y:auto}
+.mobile-menu-drawer.active{left:0}
+.mobile-menu-header{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid var(--border);background:var(--panel-gradient);flex-shrink:0}
+.mobile-menu-body{padding:12px;display:flex;flex-direction:column;gap:16px;flex:1}
+.mobile-menu-section{display:flex;flex-direction:column;gap:4px}
+.mobile-menu-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);padding:4px 8px;margin-bottom:4px}
+.mobile-menu-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:transparent;border:none;border-radius:var(--radius-md);color:var(--text-muted);font-size:13px;font-weight:600;text-align:left;cursor:pointer;transition:var(--transition);width:100%}
+.mobile-menu-item:hover,.mobile-menu-item.active{background:var(--bg-surface-elevated);color:var(--text-main)}
+.mobile-menu-item.active{background:linear-gradient(135deg,var(--accent),#8b3cf4);color:#fff;box-shadow:0 4px 12px var(--accent-glow)}
 .history-item{padding:12px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface-elevated);display:flex;flex-direction:column;gap:6px;font-size:13px;cursor:pointer}
 .history-item:hover{border-color:var(--accent)}
 .toast-container{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:9999;pointer-events:none}
@@ -152,26 +179,34 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
 .guide-card ol{display:grid;gap:6px;padding-left:20px;margin:0}
 .guide-card .btn{margin-top:auto}
 .guide-note{padding:14px 16px;border:1px solid var(--accent-amber);border-radius:6px;color:var(--text-muted);background:var(--accent-amber-dim);font-size:13px}
+.api-key-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--bg-surface-elevated);border:1px solid var(--border);border-radius:var(--radius-md)}
+.api-key-item .provider{font-weight:700;font-size:12px;text-transform:uppercase;color:var(--accent);min-width:100px}
+.api-key-item .key-mask{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.api-key-item .actions{display:flex;gap:6px}
 /* ============ RESPONSIVE — Laptop & Desktop kecil ============ */
 @media(max-width:1240px){
-  .app-header{flex-direction:column;align-items:stretch;gap:14px}
-  .header-actions{align-items:center;margin-left:0}
-  .header-actions-right{justify-content:center;width:100%}
-  .brand{justify-content:center}
-  .brand-text h1{flex-wrap:wrap}
+  header.app-header{padding:14px 16px;gap:10px}
+  .brand{gap:8px}
+  .brand-text h1{font-size:16px}
+  .brand-text .panel-subtitle{display:none}
+  .header-row-1-right,.header-row-2{gap:4px}
+  .header-row-1-right .btn,.header-row-2 .btn{width:36px;min-width:36px;padding:0;overflow:hidden;justify-content:center}
+  .header-row-1-right .header-label,.header-row-1-right .header-count,.header-row-2 .header-label,.header-row-2 .header-count{display:none}
+  .tab-dropdown-toggle{min-width:145px;max-width:170px;padding:0 8px;font-size:11px}
+  .tab-dropdown-menu{min-width:240px}
+  #communityLinksHeader{gap:3px}
+  #communityLinksHeader a{width:30px;height:30px;font-size:13px}
+  #languageSelector{width:70px!important;min-width:70px!important;max-width:70px!important;padding:0 6px!important;font-size:11px!important}
 }
 /* ============ RESPONSIVE — Tablet & Android (brand atas, tombol bawah) ============ */
 @media(max-width:900px){
-  .app-header{flex-direction:column;align-items:stretch;gap:14px;padding:16px}
-  .brand{justify-content:center}
-  .header-actions{align-items:center;margin-left:0}
-  .header-actions-right{justify-content:center;width:100%}
-  #communityLinksHeader{width:100%;justify-content:center;padding:0;border-bottom:none;margin:0;flex-wrap:wrap}
-  #communityLinksHeader a{width:44px!important;height:44px!important;font-size:22px}
-  #languageSelector{width:140px!important;min-width:140px!important;max-width:140px!important;font-size:13px}
-  .header-actions .btn,.header-actions select{min-height:44px;height:44px;font-size:13.5px}
-  .tab-btn{padding:11px 14px;font-size:13.5px;min-height:44px}
-  .brand-text h1{font-size:19px}
+  header.app-header{flex-direction:row;align-items:center;justify-content:space-between;padding:14px 16px;gap:10px}
+  .header-row-1{display:contents}
+  .header-row-1-right,.header-row-2{display:none}
+  .brand{flex:1;min-width:0}
+  .brand-text h1{font-size:16px}
+  .brand-text .panel-subtitle{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hamburger{display:inline-flex}
   .brand-icon{width:40px;height:40px}
   .modal-card{max-width:92vw}
 }
@@ -216,9 +251,9 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
 /* ============ RESPONSIVE — HP Kecil (360-480px): font min 14px, anti iOS zoom ============ */
 @media(max-width:480px){
   .app-container{padding:10px 10px 44px}
-  .header-actions .btn,.header-actions select{padding:0 10px;font-size:13px}
-  #languageSelector{width:124px!important;min-width:124px!important;max-width:124px!important}
   .tab-btn{padding:11px 12px;font-size:14px}
+  header.app-header{padding:12px}
+  .brand-text h1{font-size:15px}
   .brand-icon{width:36px;height:36px}
   .btn{padding:10px 14px;font-size:14px}
   .btn-sm{padding:8px 12px;font-size:13px}
@@ -239,53 +274,55 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
 <input type="file" id="importDorksFile" accept=".txt,.csv,.json" hidden>
 <input type="file" id="importDomainsFile" accept=".txt,.csv,.json" hidden>
 <input type="file" id="importSettingsFile" accept=".json" hidden>
-<input type="file" id="avatarUploadInput" accept="image/*" hidden>
-
 <div class="toast-container" id="toastContainer"></div>
 
 <div class="app-container">
-  <header class="app-header">
-    <div class="brand">
-      <div class="brand-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    <header class="app-header">
+      <div class="header-row-1">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <div class="brand-text">
+            <h1>LinuxPloiter <span class="badge badge-purple">v8.0</span></h1>
+            <div class="panel-subtitle">Bug Bounty Companion & Reconnaissance Workstation</div>
+          </div>
+        </div>
+        <div class="header-row-1-right">
+          <div id="communityLinksHeader"></div>
+          <button class="btn btn-secondary btn-sm" id="btnProfileModal" title="Rating & Testimonial">⭐ <span class="header-label">Rating</span></button>
+          <button class="btn btn-secondary btn-sm" id="btnSettingsModal" title="API Keys">⚙️ <span class="header-label">API Keys</span></button>
+          <select id="languageSelector" title="Language">
+            <option value="id">🇮🇩 ID</option><option value="en">🇬🇧 EN</option>
+            <option value="es">🇪🇸 ES</option><option value="fr">🇫🇷 FR</option>
+            <option value="de">🇩🇪 DE</option><option value="pt">🇵🇹 PT</option>
+            <option value="ru">🇷🇺 RU</option><option value="ja">🇯🇵 JA</option>
+            <option value="zh">🇨🇳 ZH</option><option value="ar">🇸🇦 AR</option>
+          </select>
+        </div>
       </div>
-      <div class="brand-text">
-        <h1>LinuxPloiter <span class="badge badge-purple">BUG BOUNTY COMPANION</span></h1>
-        <div class="panel-subtitle">Client-Side OSINT & Bug Bounty Reconnaissance Workstation</div>
+      <div class="header-row-2">
+        <div class="tab-dropdown" id="tabDropdown">
+          <button class="btn btn-secondary btn-sm tab-dropdown-toggle" id="btnTabDropdown" type="button" aria-haspopup="true" aria-expanded="false">
+            <span id="tabDropdownLabel">📊 Recon Dashboard</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:4px"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="tab-dropdown-menu" id="tabDropdownMenu" role="menu"></div>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="btnHistoryDrawer" title="History">🕐 <span class="header-label">History</span><span class="header-count">(<span id="historyCount">0</span>)</span></button>
+        <button class="btn btn-secondary btn-sm" id="btnThemeToggle" title="Toggle Theme">🌓 <span class="header-label">Theme</span></button>
+        <button class="btn btn-secondary btn-sm" id="btnExportReportJson" title="Export JSON">📄 <span class="header-label">JSON</span></button>
+        <button class="btn btn-secondary btn-sm" id="btnExportReportCsv" title="Export CSV">📊 <span class="header-label">CSV</span></button>
       </div>
-    </div>
-    <div class="header-actions">
-      <div id="communityLinksHeader"></div>
-      <div class="header-actions-right">
-        <button class="btn btn-secondary btn-sm" id="btnSettingsModal" title="API Keys">⚙️ API Keys</button>
-        <button class="btn btn-secondary btn-sm" id="btnHistoryDrawer" title="History">🕐 History (<span id="historyCount">0</span>)</button>
-        <button class="btn btn-secondary btn-sm" id="btnThemeToggle" title="Toggle Theme">🌓 Theme</button>
-        <button class="btn btn-secondary btn-sm" id="btnExportReportJson" title="Export JSON">📄 JSON</button>
-        <button class="btn btn-secondary btn-sm" id="btnExportReportCsv" title="Export CSV">📊 CSV</button>
-        <select id="languageSelector" title="Language">
-          <option value="id">🇮🇩 ID</option>
-          <option value="en">🇬🇧 EN</option>
-          <option value="es">🇪🇸 ES</option>
-          <option value="fr">🇫🇷 FR</option>
-          <option value="de">🇩🇪 DE</option>
-          <option value="pt">🇵🇹 PT</option>
-          <option value="ru">🇷🇺 RU</option>
-          <option value="ja">🇯🇵 JA</option>
-          <option value="zh">🇨🇳 ZH</option>
-          <option value="ar">🇸🇦 AR</option>
-        </select>
-        <button class="btn btn-secondary btn-sm" id="btnProfileModal" title="Profile">
-          <span id="userAvatarDisplay">
-            <img id="userAvatarImg" style="width:100%;height:100%;object-fit:cover;display:none">
-            <span id="userAvatarInitials">LP</span>
-          </span>
-        </button>
-      </div>
-    </div>
+      <button class="hamburger" id="btnHamburger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenuDrawer">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
   </header>
 
   <nav class="tabs-nav" id="mainTabNav">
-    <button class="tab-btn active" data-tab="tab-dashboard">📊 Dashboard</button>
+    <button class="tab-btn active" data-tab="tab-dashboard">📊 Recon Dashboard</button>
     <button class="tab-btn" data-tab="tab-dork">🎯 Dork Generator</button>
     <button class="tab-btn" data-tab="tab-google">🔍 Google API</button>
     <button class="tab-btn" data-tab="tab-securitytxt">🛡️ security.txt</button>
@@ -527,6 +564,43 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
       <div class="guide-note">
         Data pengaturan disimpan di localStorage browser. File ekspor pengaturan dapat berisi API key, jadi simpan dengan aman. CORS proxy pihak ketiga dapat melihat request yang diteruskan.
       </div>
+      <div class="guide-card guide-section">
+        <h3>🎨 Tampilan Baru v8.0</h3>
+        <h4>Header Desktop (2 Baris)</h4>
+        <p>Baris pertama menampilkan logo dan nama LinuxPloiter di kiri, serta ikon komunitas, Rating, API Keys, dan bahasa di kanan. Baris kedua menampilkan dropdown tab, History, Theme, serta ekspor JSON/CSV dari kiri.</p>
+        <ul>
+          <li><strong>Baris 1:</strong> Brand di kiri; community, Rating, API Keys, dan Language rata kanan.</li>
+          <li><strong>Baris 2:</strong> Dropdown semua tab, History, Theme, JSON, dan CSV rata kiri.</li>
+          <li>Dropdown tab dan drawer mobile dibuat otomatis dari daftar tab utama agar selalu sinkron.</li>
+        </ul>
+        <h4>Mobile Menu (Drawer)</h4>
+        <p>Pada layar di bawah 900px, tombol header dan tab desktop digantikan tombol hamburger.</p>
+        <ul>
+          <li>Klik tombol hamburger di kanan atas untuk membuka drawer dari sisi kiri.</li>
+          <li><strong>NAVIGASI:</strong> semua 14 tab yang tersedia pada navigasi desktop.</li>
+          <li><strong>TOOLS:</strong> API Keys &amp; AI, History, Theme, Export JSON/CSV, dan Rating.</li>
+          <li><strong>COMMUNITY:</strong> tautan komunitas; <strong>LANGUAGE:</strong> pilihan bahasa.</li>
+          <li>Tutup dengan tombol ✕, area gelap di luar drawer, tombol Escape, atau resize ke desktop.</li>
+        </ul>
+        <h4>API Key Manager</h4>
+        <p>Buka <strong>⚙️ API Keys &amp; AI</strong>, pilih provider, masukkan API Key, lalu pilih Simpan atau Test. Beberapa key dari provider berbeda dapat disimpan, diuji, dan dihapus satu per satu. Custom provider mendukung Base URL dan Model.</p>
+        <p>AI keys tersimpan pada localStorage browser dan digunakan oleh Error Analyzer. Kredensial browser tidak dienkripsi; jangan gunakan perangkat bersama dan jangan membagikan ekspor settings yang berisi API keys.</p>
+        <h4>Donasi</h4>
+        <p>Form input nama, email, dan HackerOne telah dihapus. Tombol PayPal dan Bitcoin serta QR code donasi tersedia di panel profil.</p>
+      </div>
+      <div class="guide-card changelog-entry">
+        <h3>Changelog</h3>
+        <h4>v8.0</h4>
+        <ul>
+          <li>Header desktop dua baris dengan brand, community, Rating, bahasa, tab dropdown, dan tombol aksi.</li>
+          <li>Menambahkan tab dropdown desktop; nav utama tetap menjadi sumber data.</li>
+          <li>Menambahkan mobile drawer dengan daftar tab yang dibuat otomatis.</li>
+          <li>Menghapus form input nama/email dan HackerOne Profile.</li>
+          <li>Tombol PayPal/Bitcoin dan QR code donasi ditampilkan di profil.</li>
+          <li>Menambahkan API Key Manager multi-provider: OpenAI, Gemini, Claude, Groq, OpenRouter, Mistral, Cohere, dan Custom.</li>
+          <li>AI API keys disimpan di localStorage dan dapat diuji/dihapus.</li>
+        </ul>
+      </div>
     </section>
 
   </main>
@@ -536,6 +610,28 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
   <div class="modal-card">
     <div class="modal-header"><h3 class="panel-title">API Key Management & CORS Proxy</h3><button class="btn btn-secondary btn-sm" id="btnCloseSettingsModal">✕</button></div>
     <div class="modal-body">
+      <div class="panel-subtitle">AI keys disimpan lokal di browser. Provider AI terbaru yang tersimpan digunakan oleh Error Analyzer.</div>
+      <div class="api-key-form" style="margin-bottom:8px;padding:16px;background:var(--bg-surface-elevated);border-radius:var(--radius-md);">
+        <div class="form-group">
+          <label for="apiKeyProvider">Provider</label>
+          <select id="apiKeyProvider">
+            <option value="openai">OpenAI (GPT)</option><option value="gemini">Google Gemini</option>
+            <option value="claude">Anthropic Claude</option><option value="groq">Groq</option>
+            <option value="openrouter">OpenRouter</option><option value="mistral">Mistral AI</option>
+            <option value="cohere">Cohere</option><option value="custom">Custom (OpenAI-compatible)</option>
+          </select>
+        </div>
+        <div class="form-group"><label for="apiKeyInput">API Key</label><input type="password" id="apiKeyInput" placeholder="sk-... / AIza... / dll" autocomplete="off"></div>
+        <div class="form-group" id="apiKeyBaseUrlGroup" style="display:none"><label for="apiKeyBaseUrl">Base URL (Custom)</label><input type="text" id="apiKeyBaseUrl" placeholder="https://api.example.com/v1"></div>
+        <div class="form-group" id="apiKeyModelGroup" style="display:none"><label for="apiKeyModel">Model (opsional)</label><input type="text" id="apiKeyModel" placeholder="gpt-4o-mini / model-id"></div>
+        <div class="utility-row">
+          <button class="btn btn-primary btn-sm" id="btnSaveApiKey" type="button">💾 Simpan</button>
+          <button class="btn btn-secondary btn-sm" id="btnTestApiKey" type="button">🧪 Test</button>
+          <button class="btn btn-secondary btn-sm" id="btnClearApiKeyForm" type="button">🗑️ Clear Form</button>
+        </div>
+      </div>
+      <div class="form-group"><label>AI API Keys Tersimpan</label><div id="apiKeyList" style="display:flex;flex-direction:column;gap:8px"></div></div>
+      <div id="apiKeyStatus" style="font-size:12px;color:var(--text-muted)"></div>
       <div class="alert alert-info">Keys disimpan di localStorage. Tidak ada server eksternal yang menerima token kamu.</div>
       <div class="form-group"><label>CORS Proxy Prefix</label><input type="text" id="settingCorsProxy" placeholder="https://corsproxy.io/?"></div>
       <div class="form-group"><label>Google API Key</label><input type="password" id="modalGoogleApiKey"></div>
@@ -587,7 +683,7 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
         <div>
           <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">LinuxPloiter</h2>
           <div style="font-size:13px;color:var(--text-muted);line-height:1.5">
-            Bug Bounty Companion · <span class="badge badge-purple" style="font-size:10px">v6.0</span>
+            Bug Bounty Companion · <span class="badge badge-purple" style="font-size:10px">v8.0</span>
           </div>
           <div style="font-size:12px;color:var(--accent-cyan);margin-top:6px;font-family:var(--font-mono)">
             Client-Side OSINT & Reconnaissance Workstation
@@ -637,30 +733,22 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
         </div>
       </div>
 
-      <!-- Bug Hunter Profile -->
-      <div style="padding:16px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md)">
-        <h3 style="color:var(--text-main);font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
-          <span style="font-size:18px">🕵️</span> Bug Hunter Profile
-        </h3>
-        <div id="profileAvatarPreview" style="width:72px;height:72px;border-radius:50%;overflow:hidden;border:2px solid var(--accent);margin-bottom:12px;background:var(--bg-surface-elevated)"></div>
-        <div class="form-grid">
-          <div class="form-group"><label>Display Name</label><input type="text" id="profileName" placeholder="Nama kamu"></div>
-          <div class="form-group"><label>Email</label><input type="email" id="profileEmail" placeholder="hunter@example.com"></div>
-          <div class="form-group"><label>HackerOne Handle</label><input type="text" id="profileHandle" placeholder="handle-h1"></div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-          <button class="btn btn-primary btn-sm" id="btnSaveProfile">💾 Save Profile</button>
-          <button class="btn btn-secondary btn-sm" id="btnUploadAvatar">📷 Upload Avatar</button>
-          <button class="btn btn-secondary btn-sm" id="btnCancelProfile">Batal</button>
-        </div>
-      </div>
-
       <!-- Donate -->
       <div style="padding:16px;background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(160,32,240,.08));border:1px solid var(--border);border-radius:var(--radius-md);text-align:center">
         <h3 style="color:var(--text-main);font-size:15px;margin-bottom:6px">💖 Dukung LinuxPloiter</h3>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
           Kalau tool ini membantu, traktir saya kopi ☕ biar tetap gratis &amp; terus dikembangkan.
         </p>
+        <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div id="qrPayPal" style="width:160px;height:160px;background:#fff;border-radius:8px;padding:8px;display:flex;align-items:center;justify-content:center"></div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-muted)">PayPal</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div id="qrBitcoin" style="width:160px;height:160px;background:#fff;border-radius:8px;padding:8px;display:flex;align-items:center;justify-content:center"></div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-muted)">Bitcoin</div>
+          </div>
+        </div>
         <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
           <a href="https://www.paypal.com/donate" target="_blank" rel="noopener noreferrer"
              class="btn btn-primary" style="text-decoration:none;gap:8px">
@@ -698,6 +786,48 @@ table.data-table tr:hover td{background:rgba(160,32,240,.03)}
   <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px" id="historyListContainer"><div style="text-align:center;color:var(--text-dim);padding:30px">Belum ada history.</div></div>
 </div>
 
+<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+<div class="mobile-menu-drawer" id="mobileMenuDrawer" aria-label="Mobile navigation">
+  <div class="mobile-menu-header">
+    <div class="brand">
+      <div class="brand-icon" style="width:32px;height:32px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="brand-text"><h1 style="font-size:16px">LinuxPloiter</h1></div>
+    </div>
+    <button class="btn btn-secondary btn-sm" id="btnCloseMobileMenu" type="button" aria-label="Close menu">✕</button>
+  </div>
+  <div class="mobile-menu-body">
+    <div class="mobile-menu-section">
+      <div class="mobile-menu-label">Navigasi</div>
+      <div id="mobileNavList"></div>
+    </div>
+    <div class="mobile-menu-section">
+      <div class="mobile-menu-label">Tools</div>
+      <button class="mobile-menu-item" id="btnMobileSettings">⚙️ API Keys &amp; AI</button>
+      <button class="mobile-menu-item" id="btnMobileHistory">🕐 History</button>
+      <button class="mobile-menu-item" id="btnMobileTheme">🌓 Toggle Theme</button>
+      <button class="mobile-menu-item" id="btnMobileExportJson">📄 Export JSON</button>
+      <button class="mobile-menu-item" id="btnMobileExportCsv">📊 Export CSV</button>
+      <button class="mobile-menu-item" id="btnMobileProfile">⭐ Rating &amp; Testimonial</button>
+    </div>
+    <div class="mobile-menu-section">
+      <div class="mobile-menu-label">Community</div>
+      <div id="mobileCommunityLinks" style="display:flex;gap:8px;padding:8px 12px;flex-wrap:wrap"></div>
+    </div>
+    <div class="mobile-menu-section">
+      <label class="mobile-menu-label" for="mobileLanguageSelector">Language</label>
+      <select id="mobileLanguageSelector" style="width:calc(100% - 24px);margin:0 12px;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-main)">
+        <option value="id">🇮🇩 Indonesia</option><option value="en">🇬🇧 English</option>
+        <option value="es">🇪🇸 Español</option><option value="fr">🇫🇷 Français</option>
+        <option value="de">🇩🇪 Deutsch</option><option value="pt">🇵🇹 Português</option>
+        <option value="ru">🇷🇺 Русский</option><option value="ja">🇯🇵 日本語</option>
+        <option value="zh">🇨🇳 中文</option><option value="ar">🇸🇦 العربية</option>
+      </select>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
 'use strict';
@@ -722,6 +852,43 @@ var weeklyChartInstance = null, featuresChartInstance = null, donutChartInstance
 function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 function attr(s){return esc(String(s==null?'':s))}
 function nt(v){return String(v==null?'':v).trim()}
+function validateInput(value,rules){
+  var v=nt(value);
+  rules=rules||{};
+  if(rules.required&&!v) return {valid:false,message:(rules.label||'Field')+' wajib diisi'};
+  if(rules.minLength&&v.length<rules.minLength) return {valid:false,message:(rules.label||'Field')+' minimal '+rules.minLength+' karakter'};
+  if(rules.pattern&&!rules.pattern.test(v)) return {valid:false,message:(rules.label||'Field')+' format tidak valid'};
+  return {valid:true};
+}
+function validateUrl(url){
+  try{var parsed=new URL(nt(url));return parsed.protocol==='http:'||parsed.protocol==='https:';}catch(e){return false;}
+}
+function validateDomain(domain){return /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(nt(domain));}
+function highlightError(el){
+  if(!el) return;
+  el.style.borderColor='var(--accent-red)';
+  el.style.boxShadow='0 0 0 2px var(--accent-red-dim)';
+  setTimeout(function(){el.style.borderColor='';el.style.boxShadow='';},3000);
+  if(typeof el.focus==='function') el.focus();
+}
+async function safeFetch(url,options){
+  try{
+    var response=await fetch(url,options);
+    if(!response.ok){
+      if(response.status===401) throw new Error('API Key tidak valid atau expired (401)');
+      if(response.status===403) throw new Error('Akses ditolak (403) - cek API Key atau IP');
+      if(response.status===404) throw new Error('Endpoint tidak ditemukan (404)');
+      if(response.status===429) throw new Error('Rate limit tercapai (429) - coba lagi nanti');
+      if(response.status>=500) throw new Error('Server error ('+response.status+') - coba lagi');
+      throw new Error('HTTP '+response.status+' '+(response.statusText||''));
+    }
+    return response;
+  }catch(error){
+    if(error.name==='AbortError') throw new Error('Request dibatalkan');
+    if(/failed to fetch|networkerror|load failed/i.test(error.message||'')) throw new Error('Network error / CORS - cek koneksi atau CORS proxy');
+    throw error;
+  }
+}
 function nd(v){return nt(v).replace(/^https?:\/\//i,'').replace(/\/$/,'').replace(/\/.*$/,'').replace(/\?.*$/,'').trim()}
 function parseDomainList(raw){return Array.from(new Set(nt(raw).split(/\r?\n|,/).map(nd).filter(Boolean).filter(function(d){return /^[a-z0-9.-]+\.[a-z]{2,}(?:\.[a-z]{2,})?$/i.test(d)||d==='localhost'})))}
 function $(id){return document.getElementById(id)}
@@ -764,7 +931,285 @@ function downloadFile(content,filename,mime){
 }
 
 function loadSavedKeys(){ try{ var r=localStorage.getItem(SK.API_KEYS); return r?JSON.parse(r):{}; }catch(e){ return {}; } }
-function saveKeys(k){ localStorage.setItem(SK.API_KEYS,JSON.stringify(k)); showToast('Configuration saved','success'); }
+function saveKeys(k){
+  var existing = loadSavedKeys();
+  if(Array.isArray(existing)) k.aiProviders = existing;
+  else if(existing && Array.isArray(existing.aiProviders)) k.aiProviders = existing.aiProviders;
+  localStorage.setItem(SK.API_KEYS,JSON.stringify(k));
+  showToast('Configuration saved','success');
+}
+
+var API_KEY_STORAGE = 'linuxploiter_api_keys';
+function getApiKeys(){
+  try{
+    var saved = JSON.parse(localStorage.getItem(API_KEY_STORAGE)||'{}');
+    return Array.isArray(saved) ? saved : (Array.isArray(saved.aiProviders) ? saved.aiProviders : []);
+  }catch(e){ return []; }
+}
+function saveApiKeys(keys){
+  var saved = {};
+  try{
+    saved = JSON.parse(localStorage.getItem(API_KEY_STORAGE)||'{}');
+    if(Array.isArray(saved)) saved = {aiProviders:saved};
+    if(!saved || typeof saved!=='object') saved = {};
+  }catch(e){ saved = {}; }
+  saved.aiProviders = Array.isArray(keys) ? keys : [];
+  localStorage.setItem(API_KEY_STORAGE,JSON.stringify(saved));
+}
+function maskKey(key){
+  if(!key) return '';
+  if(key.length<=8) return '••••••••';
+  return key.substring(0,4)+'••••••••'+key.substring(key.length-4);
+}
+function renderApiKeyList(){
+  var list = $('apiKeyList');
+  if(!list) return;
+  var keys = getApiKeys();
+  if(!keys.length){ list.innerHTML='<div style="font-size:12px;color:var(--text-dim);padding:8px">Belum ada AI API Key tersimpan.</div>'; return; }
+  list.innerHTML = keys.map(function(item,idx){
+    return '<div class="api-key-item"><span class="provider">'+esc(item.provider)+'</span><span class="key-mask" title="'+esc(item.model||'')+'">'+esc(maskKey(item.key))+'</span><div class="actions"><button class="btn btn-secondary btn-sm" type="button" data-apikey-test="'+idx+'" title="Test key">🧪</button><button class="btn btn-secondary btn-sm" type="button" data-apikey-delete="'+idx+'" title="Delete key">🗑️</button></div></div>';
+  }).join('');
+  list.querySelectorAll('[data-apikey-delete]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var idx = parseInt(btn.getAttribute('data-apikey-delete'),10);
+      var savedKeys = getApiKeys();
+      if(idx<0 || idx>=savedKeys.length) return;
+      savedKeys.splice(idx,1);
+      saveApiKeys(savedKeys);
+      renderApiKeyList();
+      showToast('AI API Key dihapus','info');
+    });
+  });
+  list.querySelectorAll('[data-apikey-test]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var idx = parseInt(btn.getAttribute('data-apikey-test'),10);
+      var item = getApiKeys()[idx];
+      if(item) testApiKey(item);
+    });
+  });
+}
+function getProviderTestRequest(item){
+  var url = '', headers = {'Content-Type':'application/json'};
+  if(item.provider==='openai'){ url='https://api.openai.com/v1/models'; headers.Authorization='Bearer '+item.key; }
+  else if(item.provider==='gemini') url='https://generativelanguage.googleapis.com/v1/models?key='+encodeURIComponent(item.key);
+  else if(item.provider==='claude'){ url='https://api.anthropic.com/v1/models'; headers['x-api-key']=item.key; headers['anthropic-version']='2023-06-01'; }
+  else if(item.provider==='groq'){ url='https://api.groq.com/openai/v1/models'; headers.Authorization='Bearer '+item.key; }
+  else if(item.provider==='openrouter'){ url='https://openrouter.ai/api/v1/models'; headers.Authorization='Bearer '+item.key; }
+  else if(item.provider==='mistral'){ url='https://api.mistral.ai/v1/models'; headers.Authorization='Bearer '+item.key; }
+  else if(item.provider==='cohere'){ url='https://api.cohere.com/v1/models'; headers.Authorization='Bearer '+item.key; }
+  else if(item.provider==='custom' && item.baseUrl){ url=item.baseUrl.replace(/\/$/,'')+'/models'; headers.Authorization='Bearer '+item.key; }
+  return url ? {url:url,headers:headers} : null;
+}
+function testApiKey(item){
+  var status = $('apiKeyStatus');
+  if(status) status.textContent='Testing '+item.provider+'...';
+  var request = getProviderTestRequest(item);
+  if(!request){ if(status) status.textContent='Provider atau Base URL belum didukung untuk test.'; return; }
+  safeFetch(request.url,{method:'GET',headers:request.headers}).then(function(response){
+    if(response.ok){
+      if(status) status.textContent=item.provider+' API Key valid.';
+      showToast('API Key valid','success');
+    }else{
+      if(status) status.textContent=item.provider+' API Key ditolak (HTTP '+response.status+').';
+      showToast('API Key invalid','error');
+    }
+  }).catch(function(error){
+    if(status) status.textContent='Test gagal: '+error.message+' (provider mungkin membatasi CORS).';
+    showToast('Error test API Key','error');
+  });
+}
+async function requestProviderAnalysis(item,input){
+  var url, headers={'Content-Type':'application/json'}, body;
+  if(item.provider==='gemini'){
+    url='https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(item.model||'gemini-2.0-flash')+':generateContent?key='+encodeURIComponent(item.key);
+    body={contents:[{parts:[{text:'Analisis error berikut untuk bug bounty:\n\n'+input}]}]};
+  }else if(item.provider==='claude'){
+    url='https://api.anthropic.com/v1/messages';
+    headers['x-api-key']=item.key; headers['anthropic-version']='2023-06-01'; headers['anthropic-dangerous-direct-browser-access']='true';
+    body={model:item.model||'claude-3-5-haiku-latest',max_tokens:1024,messages:[{role:'user',content:'Analisis error berikut untuk bug bounty:\n\n'+input}]};
+  }else if(item.provider==='cohere'){
+    url='https://api.cohere.com/v2/chat'; headers.Authorization='Bearer '+item.key;
+    body={model:item.model||'command-r7b-12-2024',messages:[{role:'user',content:'Analisis error berikut untuk bug bounty:\n\n'+input}]};
+  }else{
+    var baseUrls={openai:'https://api.openai.com/v1',groq:'https://api.groq.com/openai/v1',openrouter:'https://openrouter.ai/api/v1',mistral:'https://api.mistral.ai/v1',custom:item.baseUrl};
+    var defaults={openai:'gpt-4o-mini',groq:'llama-3.1-8b-instant',openrouter:'openai/gpt-4o-mini',mistral:'mistral-small-latest'};
+    var baseUrl=baseUrls[item.provider];
+    if(!baseUrl) throw new Error('Provider AI tidak didukung.');
+    if(item.provider==='custom'&&!item.model) throw new Error('Custom provider memerlukan Model untuk analisis.');
+    url=baseUrl.replace(/\/$/,'')+'/chat/completions'; headers.Authorization='Bearer '+item.key;
+    body={model:item.model||defaults[item.provider],messages:[{role:'user',content:'Analisis error berikut untuk bug bounty:\n\n'+input}]};
+  }
+  var response=await safeFetch(url,{method:'POST',headers:headers,body:JSON.stringify(body)});
+  var data=await response.json();
+  if(!response.ok) throw new Error((data&&data.error&&data.error.message)||('HTTP '+response.status));
+  if(item.provider==='gemini') return data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts&&data.candidates[0].content.parts[0]&&data.candidates[0].content.parts[0].text||'AI tidak mengembalikan teks.';
+  if(item.provider==='claude') return data.content&&data.content[0]&&data.content[0].text||'AI tidak mengembalikan teks.';
+  if(item.provider==='cohere') return data.message&&data.message.content&&data.message.content.map(function(part){return part.text||''}).join('')||'AI tidak mengembalikan teks.';
+  return data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content||'AI tidak mengembalikan teks.';
+}
+function initApiKeyManager(){
+  var modal=$('settingsModal'), providerSel=$('apiKeyProvider');
+  var baseUrlGroup=$('apiKeyBaseUrlGroup'), modelGroup=$('apiKeyModelGroup');
+  function updateCustomFields(){
+    var isCustom=providerSel&&providerSel.value==='custom';
+    if(baseUrlGroup) baseUrlGroup.style.display=isCustom?'flex':'none';
+    if(modelGroup) modelGroup.style.display=isCustom?'flex':'none';
+  }
+  if(providerSel) providerSel.addEventListener('change',updateCustomFields);
+  updateCustomFields();
+  var saveButton=$('btnSaveApiKey');
+  if(saveButton) saveButton.addEventListener('click',function(){
+    var keyInput=$('apiKeyInput'), baseUrlInput=$('apiKeyBaseUrl'), modelInput=$('apiKeyModel');
+    var key=keyInput?keyInput.value.trim():'';
+    var validation=validateInput(key,{required:true,label:'API Key'});
+    if(!validation.valid){showToast(validation.message,'error');highlightError(keyInput);return;}
+    var baseUrl=baseUrlInput?baseUrlInput.value.trim():'';
+    if(providerSel&&providerSel.value==='custom'){
+      validation=validateInput(baseUrl,{required:true,label:'Custom Base URL'});
+      if(!validation.valid||!validateUrl(baseUrl)){showToast(validation.valid?'Custom Base URL harus memakai http:// atau https://':validation.message,'error');highlightError(baseUrlInput);return;}
+    }
+    var keys=getApiKeys();
+    keys.push({provider:providerSel?providerSel.value:'',key:key,baseUrl:baseUrl,model:modelInput?modelInput.value.trim():'',savedAt:new Date().toISOString()});
+    saveApiKeys(keys);
+    if(keyInput) keyInput.value='';
+    if(baseUrlInput) baseUrlInput.value='';
+    if(modelInput) modelInput.value='';
+    renderApiKeyList();
+    showToast('AI API Key tersimpan','success');
+  });
+  var testButton=$('btnTestApiKey');
+  if(testButton) testButton.addEventListener('click',function(){
+    var keyInput=$('apiKeyInput'), baseUrlInput=$('apiKeyBaseUrl'), modelInput=$('apiKeyModel');
+    var key=keyInput?keyInput.value.trim():'';
+    var validation=validateInput(key,{required:true,label:'API Key'});
+    if(!validation.valid){showToast(validation.message,'error');highlightError(keyInput);return;}
+    var baseUrl=baseUrlInput?baseUrlInput.value.trim():'';
+    if(providerSel&&providerSel.value==='custom'&&!validateUrl(baseUrl)){showToast('Custom Base URL harus memakai http:// atau https://','error');highlightError(baseUrlInput);return;}
+    testApiKey({provider:providerSel?providerSel.value:'',key:key,baseUrl:baseUrl,model:modelInput?modelInput.value.trim():''});
+  });
+  var clearButton=$('btnClearApiKeyForm');
+  if(clearButton) clearButton.addEventListener('click',function(){
+    ['apiKeyInput','apiKeyBaseUrl','apiKeyModel'].forEach(function(id){var el=$(id);if(el) el.value='';});
+    var status=$('apiKeyStatus'); if(status) status.textContent='';
+  });
+  if(modal) modal.addEventListener('click',function(event){if(event.target===modal) modal.classList.remove('active');});
+  document.addEventListener('keydown',function(event){if(event.key==='Escape'&&modal) modal.classList.remove('active');});
+  renderApiKeyList();
+}
+
+function initTabDropdown(){
+  var dropdown=$('tabDropdown'), toggle=$('btnTabDropdown'), menu=$('tabDropdownMenu'), label=$('tabDropdownLabel');
+  var tabsNav=document.querySelector('nav.tabs-nav');
+  if(!dropdown||!toggle||!menu||!tabsNav) return;
+  var tabButtons=tabsNav.querySelectorAll('.tab-btn');
+  menu.innerHTML='';
+  tabButtons.forEach(function(tabButton){
+    var tabId=tabButton.getAttribute('data-tab');
+    var item=document.createElement('button');
+    item.type='button';
+    item.className='tab-dropdown-item';
+    item.setAttribute('role','menuitem');
+    item.setAttribute('data-tab-target',tabId);
+    item.textContent=tabButton.textContent.trim();
+    menu.appendChild(item);
+  });
+  function closeMenu(){
+    menu.classList.remove('active');
+    toggle.setAttribute('aria-expanded','false');
+  }
+  toggle.addEventListener('click',function(event){
+    event.stopPropagation();
+    var isOpen=menu.classList.toggle('active');
+    toggle.setAttribute('aria-expanded',isOpen?'true':'false');
+  });
+  menu.querySelectorAll('[data-tab-target]').forEach(function(item){
+    item.addEventListener('click',function(){
+      var target=document.querySelector('.tab-btn[data-tab="'+item.getAttribute('data-tab-target')+'"]');
+      if(target) target.click();
+      closeMenu();
+    });
+  });
+  function syncActiveTab(tabButton){
+    var tabId=tabButton.getAttribute('data-tab');
+    if(label) label.textContent=tabButton.textContent.trim();
+    menu.querySelectorAll('.tab-dropdown-item').forEach(function(item){
+      item.classList.toggle('active',item.getAttribute('data-tab-target')===tabId);
+      item.setAttribute('aria-current',item.getAttribute('data-tab-target')===tabId?'page':'false');
+    });
+    closeMenu();
+  }
+  tabButtons.forEach(function(tabButton){tabButton.addEventListener('click',function(){syncActiveTab(tabButton);});});
+  var activeTab=tabsNav.querySelector('.tab-btn.active');
+  if(activeTab) syncActiveTab(activeTab);
+  document.addEventListener('click',function(event){if(!dropdown.contains(event.target)) closeMenu();});
+  document.addEventListener('keydown',function(event){if(event.key==='Escape') closeMenu();});
+}
+
+function initMobileNavList(){
+  var container=$('mobileNavList'), tabsNav=document.querySelector('nav.tabs-nav');
+  if(!container||!tabsNav) return;
+  container.innerHTML='';
+  tabsNav.querySelectorAll('.tab-btn').forEach(function(tabButton){
+    var item=document.createElement('button');
+    item.type='button';
+    item.className='mobile-menu-item';
+    item.setAttribute('data-mobile-tab',tabButton.getAttribute('data-tab'));
+    item.textContent=tabButton.textContent.trim();
+    container.appendChild(item);
+  });
+}
+
+function initMobileDrawer(){
+  var drawer=$('mobileMenuDrawer'), overlay=$('mobileMenuOverlay'), openButton=$('btnHamburger'), closeButton=$('btnCloseMobileMenu');
+  function openDrawer(){
+    if(drawer){drawer.classList.add('active');drawer.scrollTop=0;}
+    if(overlay) overlay.classList.add('active');
+    if(openButton) openButton.setAttribute('aria-expanded','true');
+    document.body.style.overflow='hidden';
+  }
+  function closeDrawer(){
+    if(drawer) drawer.classList.remove('active');
+    if(overlay) overlay.classList.remove('active');
+    if(openButton) openButton.setAttribute('aria-expanded','false');
+    document.body.style.overflow='';
+  }
+  if(openButton) openButton.addEventListener('click',openDrawer);
+  if(closeButton) closeButton.addEventListener('click',closeDrawer);
+  if(overlay) overlay.addEventListener('click',closeDrawer);
+  document.querySelectorAll('[data-mobile-tab]').forEach(function(button){
+    button.addEventListener('click',function(){
+      var tabId=button.getAttribute('data-mobile-tab');
+      var target=document.querySelector('.tab-btn[data-tab="'+tabId+'"]');
+      if(target) target.click();
+      closeDrawer();
+    });
+  });
+  function updateActiveTab(tabId){
+    document.querySelectorAll('.mobile-menu-item[data-mobile-tab]').forEach(function(item){item.classList.toggle('active',item.getAttribute('data-mobile-tab')===tabId);});
+  }
+  document.querySelectorAll('.tab-btn').forEach(function(button){button.addEventListener('click',function(){updateActiveTab(button.getAttribute('data-tab'));});});
+  var activeTab=document.querySelector('.tab-btn.active[data-tab]');
+  if(activeTab) updateActiveTab(activeTab.getAttribute('data-tab'));
+  var actionMap={btnMobileSettings:'btnSettingsModal',btnMobileHistory:'btnHistoryDrawer',btnMobileExportJson:'btnExportReportJson',btnMobileExportCsv:'btnExportReportCsv',btnMobileProfile:'btnProfileModal'};
+  Object.keys(actionMap).forEach(function(id){
+    var button=$(id);
+    if(button) button.addEventListener('click',function(){var target=$(actionMap[id]);if(target) target.click();closeDrawer();});
+  });
+  var mobileTheme=$('btnMobileTheme');
+  if(mobileTheme) mobileTheme.addEventListener('click',function(){var target=$('btnThemeToggle');if(target) target.click();closeDrawer();});
+  var desktopLanguage=$('languageSelector'), mobileLanguage=$('mobileLanguageSelector');
+  if(mobileLanguage&&desktopLanguage){
+    mobileLanguage.value=desktopLanguage.value;
+    mobileLanguage.addEventListener('change',function(){desktopLanguage.value=mobileLanguage.value;desktopLanguage.dispatchEvent(new Event('change'));});
+    desktopLanguage.addEventListener('change',function(){mobileLanguage.value=desktopLanguage.value;});
+  }
+  var mobileCommunity=$('mobileCommunityLinks');
+  if(mobileCommunity&&typeof COMMUNITY_PLATFORMS!=='undefined'){
+    mobileCommunity.innerHTML=COMMUNITY_PLATFORMS.map(function(platform){return '<a href="'+esc(platform.url)+'" target="_blank" rel="noopener noreferrer" title="'+esc(platform.name)+'" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--radius-md);background:var(--bg-surface-elevated);border:1px solid var(--border);text-decoration:none">'+platform.icon+'</a>';}).join('');
+  }
+  document.addEventListener('keydown',function(event){if(event.key==='Escape') closeDrawer();});
+  window.addEventListener('resize',function(){if(window.innerWidth>900) closeDrawer();});
+}
 function getCorsProxy(){ return (loadSavedKeys().corsProxy||'').trim(); }
 function wrapWithCorsProxy(url){
   var p = getCorsProxy();
@@ -829,6 +1274,18 @@ function renderCommunityLinks(){
 function renderDonations(){
   var c = $('donationLinks'); if(!c) return;
   c.innerHTML = '<div style="display:flex;flex-direction:column;gap:8px"><a href="https://www.paypal.com/donate" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="justify-content:flex-start">💳 PayPal Donation</a><div style="display:flex;align-items:center;gap:8px;background:var(--bg-input);padding:10px 12px;border-radius:var(--radius-md);border:1px solid var(--border)"><span style="font-size:16px">₿</span><code style="font-family:var(--font-mono);font-size:12px;color:var(--accent-cyan);word-break:break-all">bc1qlinuxploiterxxxxxxxxxxxxxxxxxxxxxx</code><button class="btn btn-secondary btn-sm" data-copy-text="bc1qlinuxploiterxxxxxxxxxxxxxxxxxxxxxx" data-copy-label="Bitcoin address copied!">Copy</button></div></div>';
+}
+function renderQRCodes(){
+  if(typeof QRCode==='undefined') return;
+  var qrPayPalEl=$('qrPayPal'), qrBitcoinEl=$('qrBitcoin');
+  if(qrPayPalEl){
+    qrPayPalEl.innerHTML='';
+    new QRCode(qrPayPalEl,{text:'https://www.paypal.com/donate',width:144,height:144,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  }
+  if(qrBitcoinEl){
+    qrBitcoinEl.innerHTML='';
+    new QRCode(qrBitcoinEl,{text:'bitcoin:bc1qlinuxploiterxxxxxxxxxxxxxxxxxxxxxx',width:144,height:144,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  }
 }
 
 var RECON_TOOLS = [
@@ -1066,12 +1523,17 @@ function addBountyEntry(){
 
 function generateReport(){
   var program = nt($('reportProgram').value)||'N/A';
-  var title = nt($('reportTitle').value)||'Untitled Vulnerability';
+  var titleInput=$('reportTitle'), descriptionInput=$('reportDescription');
+  var title = nt(titleInput&&titleInput.value);
   var severity = $('reportSeverity').value;
-  var description = nt($('reportDescription').value)||'N/A';
+  var description = nt(descriptionInput&&descriptionInput.value);
   var steps = nt($('reportSteps').value)||'N/A';
   var impact = nt($('reportImpact').value)||'N/A';
   var remediation = nt($('reportRemediation').value)||'N/A';
+  var validation=validateInput(title,{required:true,label:'Title'});
+  if(!validation.valid){showToast(validation.message,'error');highlightError(titleInput);return null;}
+  validation=validateInput(description,{required:true,label:'Description'});
+  if(!validation.valid){showToast(validation.message,'error');highlightError(descriptionInput);return null;}
   var md = '# '+title+'\n\n**Program:** '+program+'\n**Severity:** '+severity+'\n**Date:** '+new Date().toISOString().slice(0,10)+'\n\n## Description\n'+description+'\n\n## Steps to Reproduce\n'+steps+'\n\n## Impact\n'+impact+'\n\n## Remediation\n'+remediation+'\n';
   var out = $('reportOutput'); if(out) out.textContent = md;
   return md;
@@ -1090,24 +1552,34 @@ var ERROR_PATTERNS = [
   {pattern:/dns|nxdomain|servfail/i,title:'DNS Error',advice:'Domain resolution failed.',severity:'high'}
 ];
 async function analyzeError(){
-  var input = nt($('errorInput').value);
+  var inputElement=$('errorInput');
+  var input = nt(inputElement&&inputElement.value);
   var output = $('errorOutput');
-  if(!input){ showToast('Paste error dulu','warning'); return; }
+  var validation=validateInput(input,{required:true,minLength:10,label:'Error Message'});
+  if(!validation.valid){showToast(validation.message,'warning');highlightError(inputElement);return;}
   var matches = ERROR_PATTERNS.filter(function(p){return p.pattern.test(input)});
   var result = matches.length ? matches.map(function(m){return '['+m.severity.toUpperCase()+'] '+m.title+'\n→ '+m.advice}).join('\n\n') : 'No known pattern matched. Application-specific error.';
   output.textContent = result;
   var keys = loadSavedKeys();
-  if(keys.geminiApiKey){
+  var aiKeys = getApiKeys();
+  if(aiKeys.length){
+    var activeAiKey = aiKeys[aiKeys.length-1];
+    output.textContent = result+'\n\n[AI] Menghubungi '+activeAiKey.provider+'...';
+    try{
+      var aiText = await requestProviderAnalysis(activeAiKey,input);
+      result += '\n\n=== AI Analysis ('+activeAiKey.provider+') ===\n'+aiText;
+    }catch(aiError){ result += '\n\n[AI] '+activeAiKey.provider+' gagal: '+aiError.message; }
+  } else if(keys.geminiApiKey){
     output.textContent = result+'\n\n[AI] Menghubungi Gemini...';
     try{
-      var r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key='+encodeURIComponent(keys.geminiApiKey),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:'Analisis error berikut untuk bug bounty:\n\n'+input}]}]})});
+      var r = await safeFetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key='+encodeURIComponent(keys.geminiApiKey),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:'Analisis error berikut untuk bug bounty:\n\n'+input}]}]})});
       var d = await r.json(); var t = d&&d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts&&d.candidates[0].content.parts[0]&&d.candidates[0].content.parts[0].text;
       if(t) result += '\n\n=== AI Analysis (Gemini) ===\n'+t;
     }catch(e){ result += '\n\n[AI] Gemini gagal: '+e.message; }
   } else if(keys.groqApiKey){
     output.textContent = result+'\n\n[AI] Menghubungi Groq...';
     try{
-      var r2 = await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+keys.groqApiKey},body:JSON.stringify({model:'llama3-8b-8192',messages:[{role:'user',content:'Analisis error berikut untuk bug bounty:\n\n'+input}]})});
+      var r2 = await safeFetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+keys.groqApiKey},body:JSON.stringify({model:'llama3-8b-8192',messages:[{role:'user',content:'Analisis error berikut untuk bug bounty:\n\n'+input}]})});
       var d2 = await r2.json(); var t2 = d2&&d2.choices&&d2.choices[0]&&d2.choices[0].message&&d2.choices[0].message.content;
       if(t2) result += '\n\n=== AI Analysis (Groq) ===\n'+t2;
     }catch(e){ result += '\n\n[AI] Groq gagal: '+e.message; }
@@ -1231,6 +1703,15 @@ function generateDorks(){
   var platforms = getActiveChips('dorkPlatformChips');
   var paths = getActiveChips('dorkPathChips');
   var keywords = getActiveChips('dorkKeywordChips');
+  if(targetDomain&&!validateDomain(targetDomain)){
+    showToast('Target domain format tidak valid','warning');
+    highlightError($('dorkTargetDomain'));
+    return;
+  }
+  if(!platforms.length&&!paths.length&&!keywords.length){
+    showToast('Pilih minimal satu chip untuk membuat dork','warning');
+    return;
+  }
   var ftClause = filetype ? ' filetype:'+filetype : '';
   var dorks = [];
   var scopeSites = targetDomain ? ['site:'+targetDomain] : platforms.map(function(p){return 'site:'+p});
@@ -1282,14 +1763,19 @@ function exportDorks(format){
 }
 
 async function executeGoogleSearch(){
-  var apiKey = nt($('googleApiKey').value), cx = nt($('googleCx').value), query = nt($('googleQuery').value);
+  var apiKeyEl=$('googleApiKey'), cxEl=$('googleCx'), queryEl=$('googleQuery');
+  var apiKey = nt(apiKeyEl&&apiKeyEl.value), cx = nt(cxEl&&cxEl.value), query = nt(queryEl&&queryEl.value);
   var statusEl = $('googleSearchStatus'), container = $('googleResultsList'), countEl = $('googleResultCount');
-  if(!apiKey||!cx){ showToast('Google API Key & CX wajib','error'); return; }
-  if(!query||query.length<3){ showToast('Query minimal 3 karakter','warning'); return; }
+  var validation=validateInput(apiKey,{required:true,minLength:20,label:'Google API Key'});
+  if(!validation.valid){showToast(validation.message,'error');highlightError(apiKeyEl);return;}
+  validation=validateInput(cx,{required:true,minLength:10,label:'CX ID'});
+  if(!validation.valid){showToast(validation.message,'error');highlightError(cxEl);return;}
+  validation=validateInput(query,{required:true,minLength:3,label:'Query'});
+  if(!validation.valid){showToast(validation.message,'error');highlightError(queryEl);return;}
   statusEl.style.display='block'; statusEl.textContent='Executing Google Custom Search...'; container.innerHTML='';
   try{
     var rawUrl = 'https://www.googleapis.com/customsearch/v1?key='+encodeURIComponent(apiKey)+'&cx='+encodeURIComponent(cx)+'&q='+encodeURIComponent(query);
-    var resp = await fetch(wrapWithCorsProxy(rawUrl));
+    var resp = await safeFetch(wrapWithCorsProxy(rawUrl));
     var data = await resp.json();
     if(data.error) throw new Error(data.error.message);
     var items = data.items||[];
@@ -1347,8 +1833,14 @@ async function probeDomain(domain,timeoutMs,pathChoice,signal){
   return {domain:clean,status:'Not Found',statusCode:404,path:paths[0],latency:Math.round(performance.now()-start)};
 }
 async function startSecurityScan(){
-  var rawDomains = parseDomainList($('securityTxtDomains').value);
-  if(!rawDomains.length){ showToast('Paste minimal 1 domain valid','warning'); return; }
+  var domainInput=$('securityTxtDomains');
+  var rawValue=domainInput?nt(domainInput.value):'';
+  var enteredDomains=rawValue.split(/\r?\n|,/).map(nd).filter(Boolean);
+  var invalidDomain=enteredDomains.filter(function(domain){return !validateDomain(domain);});
+  if(!enteredDomains.length){ showToast('Masukkan minimal 1 domain','warning'); highlightError(domainInput); return; }
+  if(invalidDomain.length){ showToast('Domain tidak valid: '+invalidDomain[0],'warning'); highlightError(domainInput); return; }
+  var rawDomains = parseDomainList(rawValue);
+  if(!rawDomains.length){ showToast('Tidak ada domain valid untuk dipindai','warning'); highlightError(domainInput); return; }
   $('btnStartSecurityScan').disabled = true;
   $('btnStopSecurityScan').disabled = false;
   activeScanAbortController = new AbortController();
@@ -1402,14 +1894,17 @@ async function startSecurityScan(){
 }
 
 async function executeShodan(){
-  var apiKey = nt($('shodanApiKey').value), query = nt($('shodanQuery').value);
+  var apiKeyEl=$('shodanApiKey'), queryEl=$('shodanQuery');
+  var apiKey = nt(apiKeyEl&&apiKeyEl.value), query = nt(queryEl&&queryEl.value);
   var container = $('shodanResultsList'), badge = $('shodanCountBadge');
-  if(!apiKey){ showToast('Shodan API Key wajib','error'); return; }
-  if(!query||query.length<3){ showToast('Query min 3 karakter','warning'); return; }
+  var validation=validateInput(apiKey,{required:true,label:'Shodan API Key'});
+  if(!validation.valid){showToast(validation.message,'error');highlightError(apiKeyEl);return;}
+  validation=validateInput(query,{required:true,minLength:3,label:'Query'});
+  if(!validation.valid){showToast(validation.message,'warning');highlightError(queryEl);return;}
   container.innerHTML = '<div class="alert alert-info">Querying Shodan...</div>';
   try{
     var rawUrl = 'https://api.shodan.io/shodan/host/search?key='+encodeURIComponent(apiKey)+'&query='+encodeURIComponent(query);
-    var resp = await fetch(wrapWithCorsProxy(rawUrl));
+    var resp = await safeFetch(wrapWithCorsProxy(rawUrl));
     var data = await resp.json();
     if(data.error) throw new Error(data.error);
     var matches = data.matches||[];
@@ -1432,15 +1927,20 @@ async function executeShodan(){
 }
 
 async function executeCensys(){
-  var apiId = nt($('censysApiId').value), apiSecret = nt($('censysApiSecret').value), query = nt($('censysQuery').value);
+  var apiIdEl=$('censysApiId'), secretEl=$('censysApiSecret'), queryEl=$('censysQuery');
+  var apiId = nt(apiIdEl&&apiIdEl.value), apiSecret = nt(secretEl&&secretEl.value), query = nt(queryEl&&queryEl.value);
   var container = $('censysResultsList'), badge = $('censysCountBadge');
-  if(!apiId||!apiSecret){ showToast('Censys API ID & Secret wajib','error'); return; }
-  if(!query||query.length<3){ showToast('Query min 3 karakter','warning'); return; }
+  var validation=validateInput(apiId,{required:true,label:'Censys API ID'});
+  if(!validation.valid){showToast(validation.message,'error');highlightError(apiIdEl);return;}
+  validation=validateInput(apiSecret,{required:true,label:'Censys API Secret'});
+  if(!validation.valid){showToast(validation.message,'error');highlightError(secretEl);return;}
+  validation=validateInput(query,{required:true,minLength:3,label:'Query'});
+  if(!validation.valid){showToast(validation.message,'warning');highlightError(queryEl);return;}
   container.innerHTML = '<div class="alert alert-info">Executing Censys Search...</div>';
   try{
     var rawUrl = 'https://search.censys.io/api/v2/hosts/search?q='+encodeURIComponent(query)+'&per_page=25';
     var auth = 'Basic '+btoa(apiId+':'+apiSecret);
-    var resp = await fetch(wrapWithCorsProxy(rawUrl),{headers:{'Authorization':auth,'Accept':'application/json'}});
+    var resp = await safeFetch(wrapWithCorsProxy(rawUrl),{headers:{'Authorization':auth,'Accept':'application/json'}});
     var data = await resp.json();
     if(data.code&&data.code>=400) throw new Error(data.error||('Censys error '+data.code));
     var hits = (data.result&&data.result.hits)||[];
@@ -1497,11 +1997,12 @@ function loadSampleH1(){
 }
 async function fetchH1Scope(){
   var h = nt($('h1Handle').value);
-  if(!h||!/^[a-z0-9_-]+$/i.test(h)){ showToast('Handle tidak valid','warning'); return; }
+  var handleInput=$('h1Handle');
+  var validation=validateInput(h,{required:true,pattern:/^[a-z0-9]+$/i,label:'HackerOne handle'});
+  if(!validation.valid){showToast(validation.message,'warning');highlightError(handleInput);return;}
   showToast('Fetching scope untuk '+h+'...','info');
   try{
-    var resp = await fetch(wrapWithCorsProxy('https://hackerone.com/teams/'+encodeURIComponent(h)+'/assets.json'));
-    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    var resp = await safeFetch(wrapWithCorsProxy('https://hackerone.com/teams/'+encodeURIComponent(h)+'/assets.json'));
     var data = await resp.json();
     var inS = (data.in_scope||[]).map(function(i){return {asset_identifier:i.asset_identifier||i.identifier,asset_type:i.asset_type,eligible_for_bounty:i.eligible_for_bounty!==false,max_severity:i.max_severity||'Critical',instruction:i.instruction||''}});
     var outS = (data.out_of_scope||[]).map(function(o){return {asset_identifier:o.asset_identifier||o.identifier,asset_type:o.asset_type,reason:o.instruction||'Out of scope'}});
@@ -1757,7 +2258,7 @@ function bindEvents(){
   });
 
   var settingsModal = $('settingsModal');
-  $('btnSettingsModal').addEventListener('click',function(){ populateSettingsInputs(); settingsModal.classList.add('active'); });
+  $('btnSettingsModal').addEventListener('click',function(){ populateSettingsInputs(); renderApiKeyList(); settingsModal.classList.add('active'); });
   $('btnCloseSettingsModal').addEventListener('click',function(){ settingsModal.classList.remove('active'); });
   $('btnSaveSettings').addEventListener('click',function(){
     var keys = {
@@ -1905,10 +2406,10 @@ function bindEvents(){
   $('btnAddBountyEntry').addEventListener('click',addBountyEntry);
 
   $('btnGenerateReport').addEventListener('click',generateReport);
-  $('btnCopyReport').addEventListener('click',function(){ var md = generateReport(); copyToClipboard(md,'Report copied'); });
-  $('btnDownloadReportMd').addEventListener('click',function(){ var md = generateReport(); downloadFile(md,'vulnerability_report.md','text/markdown'); });
+  $('btnCopyReport').addEventListener('click',function(){ var md = generateReport(); if(md) copyToClipboard(md,'Report copied'); });
+  $('btnDownloadReportMd').addEventListener('click',function(){ var md = generateReport(); if(md) downloadFile(md,'vulnerability_report.md','text/markdown'); });
   $('btnDownloadReportJson').addEventListener('click',function(){
-    generateReport();
+    var md = generateReport(); if(!md) return;
     var d = {program:nt($('reportProgram').value),title:nt($('reportTitle').value),severity:$('reportSeverity').value,description:nt($('reportDescription').value),steps:nt($('reportSteps').value),impact:nt($('reportImpact').value),remediation:nt($('reportRemediation').value),generatedAt:new Date().toISOString()};
     downloadFile(JSON.stringify(d,null,2),'vulnerability_report.json','application/json');
   });
@@ -1922,22 +2423,13 @@ function bindEvents(){
   $('btnExportReportCsv').addEventListener('click',exportReportCsv);
 
   var pm = $('profileModal');
-  $('btnProfileModal').addEventListener('click',function(){ pm.classList.add('active'); });
+  var profileButton = $('btnProfileModal');
+  if(profileButton) profileButton.addEventListener('click',function(){
+    if(pm) pm.classList.add('active');
+    setTimeout(renderQRCodes,100);
+  });
   $('btnCloseProfileModalBottom').addEventListener('click',function(){ pm.classList.remove('active'); });
   $('btnCloseProfileModal').addEventListener('click',function(){ pm.classList.remove('active'); });
-  $('btnCancelProfile').addEventListener('click',function(){ pm.classList.remove('active'); });
-  $('btnSaveProfile').addEventListener('click',function(){
-    var p = {name:nt($('profileName').value),email:nt($('profileEmail').value),handle:nt($('profileHandle').value),avatar:loadProfile().avatar||''};
-    saveProfile(p); renderAvatar(); pm.classList.remove('active'); showToast('Profile saved','success');
-  });
-  $('btnUploadAvatar').addEventListener('click',function(){ $('avatarUploadInput').click(); });
-  $('avatarUploadInput').addEventListener('change',function(e){
-    var f = e.target.files&&e.target.files[0]; if(!f) return;
-    var reader = new FileReader();
-    reader.onload = function(ev){ var p = loadProfile(); p.avatar = ev.target.result; saveProfile(p); renderAvatar(); showToast('Avatar updated','success'); };
-    reader.readAsDataURL(f); e.target.value = '';
-  });
-
   var ls = $('languageSelector');
   if(ls) ls.addEventListener('change',function(e){ currentLang = e.target.value; localStorage.setItem(SK.LANG,currentLang); showToast('Language: '+currentLang,'info'); });
 
@@ -1957,6 +2449,10 @@ document.addEventListener('DOMContentLoaded',function(){
   initTools();
   renderCommunityLinks();
   renderDonations();
+  initTabDropdown();
+  initMobileNavList();
+  initMobileDrawer();
+  initApiKeyManager();
   populateSettingsInputs();
   restoreFormState();
   renderHistory();
@@ -1970,7 +2466,16 @@ document.addEventListener('DOMContentLoaded',function(){
     localStorage.setItem(SK.STATS,JSON.stringify(seed));
     renderDashboard();
   }
-  showToast('LinuxPloiter v6.0 loaded','success');
+  showToast('LinuxPloiter v8.0 loaded','success');
+});
+
+window.addEventListener('error',function(event){
+  console.error('Global error:',event.error);
+  if(typeof showToast==='function') showToast('Error: '+(event.message||'Unknown'),'error');
+});
+window.addEventListener('unhandledrejection',function(event){
+  console.error('Unhandled promise:',event.reason);
+  if(typeof showToast==='function') showToast('Error: '+(event.reason&&event.reason.message||'Promise rejected'),'error');
 });
 
 })();
