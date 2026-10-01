@@ -21,7 +21,6 @@ Client-side OSINT dan reconnaissance toolkit untuk workflow bug bounty yang beri
 
 ## 🧭 Daftar Isi
 
-- [📸 Screenshots](#-screenshots)
 - [🐧 Apa Itu LinuxPloiter?](#-apa-itu-linuxploiter)
 - [✨ Fitur Utama](#-fitur-utama)
 - [🚀 Quick Start](#-quick-start)
