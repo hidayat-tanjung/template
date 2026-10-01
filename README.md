@@ -624,8 +624,8 @@ Sebelum membuat pull request:
 
 <div align="center">
 
-[![GitHub](https://img.shields.io/badge/GitHub-OWNER%2FREPOSITORY-181717?style=for-the-badge&logo=github)](https://github.com/OWNER/REPOSITORY)
+[![GitHub](https://img.shields.io/badge/GitHub-OWNER%2FREPOSITORY-181717?style=for-the-badge&logo=github)](https://github.com/hidayat-tanjung/template/blob/main/index.html)
 [![Twitter/X](https://img.shields.io/badge/Twitter%2FX-Profile-000000?style=for-the-badge&logo=x)](https://x.com/)
-[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord)](https://discord.com/)
+[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord)](https://discord.gg/aJvSAqDcQ)
 [![Email](https://img.shields.io/badge/Email-Contact-EA4335?style=for-the-badge&logo=gmail)](mailto:YOUR_EMAIL@example.com)
 
