@@ -19,42 +19,6 @@ Client-side OSINT dan reconnaissance toolkit untuk workflow bug bounty yang beri
 
 > **Setup repository:** ganti `OWNER/REPOSITORY` pada badge dan tautan dengan alamat GitHub proyek yang sebenarnya. Hubungkan badge License ke file `LICENSE` saat file tersebut tersedia.
 
-## 📸 Screenshots
-
-Screenshot belum disertakan di repository. Simpan gambar yang sesuai di folder `screenshots/` menggunakan nama di bawah, atau ubah path Markdown jika nama file berbeda.
-
-<div align="center">
-
-![Desktop Recon Dashboard](screenshots/desktop-dashboard.png)
-
-*Dashboard desktop: ringkasan scan, aktivitas mingguan, dan penggunaan tools.*
-
-![Desktop Header](screenshots/desktop-header.png)
-
-*Header desktop dua baris dengan navigasi tab dan aksi utama.*
-
-![Mobile Drawer](screenshots/mobile-drawer.png)
-
-*Mobile drawer dengan navigasi tab, tools, community, dan pilihan bahasa.*
-
-![API Key Manager](screenshots/api-key-manager.png)
-
-*API Key Manager multi-provider dengan key yang dimask.*
-
-![Donation QR Codes](screenshots/donation-qr.png)
-
-*Panel donasi PayPal dan Bitcoin di modal profil.*
-
-![Recon Tools](screenshots/recon-tools.png)
-
-*Daftar Recon Tools dengan pencarian kategori.*
-
-![Guide](screenshots/guide.png)
-
-*Panduan fitur dan changelog v8.0.*
-
-</div>
-
 ## 🧭 Daftar Isi
 
 - [📸 Screenshots](#-screenshots)
@@ -665,20 +629,3 @@ Sebelum membuat pull request:
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord)](https://discord.com/)
 [![Email](https://img.shields.io/badge/Email-Contact-EA4335?style=for-the-badge&logo=gmail)](mailto:YOUR_EMAIL@example.com)
 
-Ganti tautan placeholder di atas dengan akun dan kontak resmi sebelum README dipublikasikan.
-
-</div>
-
-## ⬆️ Footer
-
-<div align="center">
-
-🌟 Kalau tool ini membantu, kasih bintang di GitHub! 🌟
-
-Dibuat dengan ❤️ untuk komunitas bug bounty Indonesia.
-
-Weekend update — atau saat ada waktu luang.
-
-[⬆️ Kembali ke atas](#-linuxploiter)
-
-</div>
